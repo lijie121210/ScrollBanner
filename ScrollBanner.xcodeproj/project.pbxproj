@@ -14,6 +14,11 @@
 		182529AE1E10B9B000E157D6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 182529AC1E10B9B000E157D6 /* LaunchScreen.storyboard */; };
 		182529B91E10B9B000E157D6 /* ScrollBannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182529B81E10B9B000E157D6 /* ScrollBannerTests.swift */; };
 		182529C41E10B9B000E157D6 /* ScrollBannerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182529C31E10B9B000E157D6 /* ScrollBannerUITests.swift */; };
+		182529D21E10BAE500E157D6 /* ScrollBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182529D11E10BAE500E157D6 /* ScrollBannerView.swift */; };
+		182529D61E1134E900E157D6 /* img1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 182529D31E1134E900E157D6 /* img1.jpg */; };
+		182529D71E1134E900E157D6 /* img2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 182529D41E1134E900E157D6 /* img2.jpg */; };
+		182529D81E1134E900E157D6 /* img3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 182529D51E1134E900E157D6 /* img3.jpg */; };
+		182529DA1E11411400E157D6 /* placeholder.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 182529D91E11411400E157D6 /* placeholder.jpg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +52,11 @@
 		182529BF1E10B9B000E157D6 /* ScrollBannerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScrollBannerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		182529C31E10B9B000E157D6 /* ScrollBannerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollBannerUITests.swift; sourceTree = "<group>"; };
 		182529C51E10B9B000E157D6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		182529D11E10BAE500E157D6 /* ScrollBannerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ScrollBannerView.swift; path = Class/ScrollBannerView.swift; sourceTree = SOURCE_ROOT; };
+		182529D31E1134E900E157D6 /* img1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = img1.jpg; sourceTree = "<group>"; };
+		182529D41E1134E900E157D6 /* img2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = img2.jpg; sourceTree = "<group>"; };
+		182529D51E1134E900E157D6 /* img3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = img3.jpg; sourceTree = "<group>"; };
+		182529D91E11411400E157D6 /* placeholder.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = placeholder.jpg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,10 +109,15 @@
 			children = (
 				182529A31E10B9B000E157D6 /* AppDelegate.swift */,
 				182529A51E10B9B000E157D6 /* ViewController.swift */,
+				182529D11E10BAE500E157D6 /* ScrollBannerView.swift */,
 				182529A71E10B9B000E157D6 /* Main.storyboard */,
 				182529AA1E10B9B000E157D6 /* Assets.xcassets */,
 				182529AC1E10B9B000E157D6 /* LaunchScreen.storyboard */,
 				182529AF1E10B9B000E157D6 /* Info.plist */,
+				182529D91E11411400E157D6 /* placeholder.jpg */,
+				182529D31E1134E900E157D6 /* img1.jpg */,
+				182529D41E1134E900E157D6 /* img2.jpg */,
+				182529D51E1134E900E157D6 /* img3.jpg */,
 			);
 			path = ScrollBanner;
 			sourceTree = "<group>";
@@ -232,7 +247,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				182529DA1E11411400E157D6 /* placeholder.jpg in Resources */,
 				182529AE1E10B9B000E157D6 /* LaunchScreen.storyboard in Resources */,
+				182529D81E1134E900E157D6 /* img3.jpg in Resources */,
+				182529D71E1134E900E157D6 /* img2.jpg in Resources */,
+				182529D61E1134E900E157D6 /* img1.jpg in Resources */,
 				182529AB1E10B9B000E157D6 /* Assets.xcassets in Resources */,
 				182529A91E10B9B000E157D6 /* Main.storyboard in Resources */,
 			);
@@ -259,6 +278,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				182529D21E10BAE500E157D6 /* ScrollBannerView.swift in Sources */,
 				182529A61E10B9B000E157D6 /* ViewController.swift in Sources */,
 				182529A41E10B9B000E157D6 /* AppDelegate.swift in Sources */,
 			);

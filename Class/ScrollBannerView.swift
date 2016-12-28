@@ -8,145 +8,65 @@
 
 import UIKit
 
-class ScrollBannerCell: UICollectionViewCell {
-    
-    struct ReuseID {
-        static let id: String = "ScrollBannerCell_ReuseID"
-    }
-    
-    weak var imageView: UIImageView?
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        createViews()
-    }
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        createViews()
-    }
-    func createViews() {
-        let imgView = UIImageView()
-        imgView.backgroundColor = UIColor.clear
-        imgView.clipsToBounds = true
-        imgView.contentMode = .scaleAspectFill
-        self.contentView.addSubview(imgView)
-        
-        imageView = imgView
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        imageView?.frame = bounds
-        
-        print("ScrollBannerCell layoutSubviews: ", imageView?.frame ?? "---")
-    }
-}
 
-
+/// Banner
+///
 class ScrollBannerView: UIView {
-
-    var collectionView: UICollectionView!
-    var flowLayout: UICollectionViewFlowLayout!
-    
-    var scrollDirection: UICollectionViewScrollDirection = .horizontal
     
     var timer: Timer!
+    var collectionView: UICollectionView!
+    var pageControl: ProgressPageControl!
     
-    var items: [String] = []
+    var layout: BannerLayout! {
+        didSet {
+            updateLayout()
+        }
+    }
+    var items: [CellConfigurable] = [] {
+        didSet {
+            scroll()
+        }
+    }
+    
     var itemCount: Int = 0
+    let contentExpendFactor: Int = 50
     
     deinit {
-        print("deinit")
+        print("ScrollBannerView.deinit", collectionView == nil)
+    }
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        customBanner(withLayout: nil, andCellClass: nil, withReuseIdentifier: nil, needReloadData: false)
+        initialization()
     }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     override func awakeFromNib() {
         super.awakeFromNib()
         
-        customBanner(withLayout: nil, andCellClass: nil, withReuseIdentifier: nil, needReloadData: false)
+        initialization()
     }
-    
     override func layoutSubviews() {
         super.layoutSubviews()
-        
-        flowLayout.itemSize = frame.size
-        print("layoutSubviews: ", flowLayout.itemSize)
+        layout.itemSize = frame.size
         update(to: itemCount / 2, false)
     }
-
     override func willMove(toSuperview newSuperview: UIView?) {
         guard newSuperview == nil else {
             return
         }
         print("removed from superview")
         invalidTimer()
-        collectionView.dataSource = nil
-        collectionView.delegate = nil
-        collectionView = nil
-        flowLayout = nil
+        cleanupCollectionView()
+        cleanupLayout()
     }
-    
-    /// adjust collection view layout; cell is not support now
-    func customBanner(withLayout layout: UICollectionViewLayout?,
-                      andCellClass anyClass: AnyClass?, withReuseIdentifier id: String?,
-                      needReloadData reload:Bool = true) {
-        if let cv = collectionView {
-            cv.dataSource = nil
-            cv.delegate = nil
-            cv.removeFromSuperview()
-            collectionView = nil
-        }
-        if let _ = flowLayout {
-            flowLayout = nil
-        }
-        
-        flowLayout = UICollectionViewFlowLayout()
-        flowLayout.itemSize = frame.size
-        flowLayout.minimumLineSpacing = 0.0
-        flowLayout.scrollDirection = .horizontal
-        
-        collectionView = setupCollectionView(withLayout: layout ?? flowLayout)
-        collectionView.dataSource = self
-        collectionView.delegate = self
-
-        collectionView.register(anyClass ?? ScrollBannerCell.self, forCellWithReuseIdentifier: id ?? ScrollBannerCell.ReuseID.id)
-        self.addSubview(collectionView)
-        
-        if reload {
-            collectionView.reloadData()
-        }
-    }
-    
-    /// create a new UICollectionView instance
-    private func setupCollectionView(withLayout layout: UICollectionViewLayout) -> UICollectionView {
-        let cv: UICollectionView = UICollectionView(frame: bounds, collectionViewLayout: layout)
-        cv.backgroundColor = UIColor.clear
-        cv.isPagingEnabled = true
-        cv.showsVerticalScrollIndicator = false
-        cv.showsHorizontalScrollIndicator = false
-        cv.scrollsToTop = false
-        return cv
-    }
-    
     
     /// timer
     ///
     /// recreate a new timer instance
     func fireTimer() {
         invalidTimer()
-        
         timer = Timer.scheduledTimer(timeInterval: 3.0,
                                      target: self,
                                      selector: #selector(ScrollBannerView.timerAction),
@@ -168,31 +88,153 @@ class ScrollBannerView: UIView {
         update(to: currentIndex() + 1)
     }
     
+    /// Collection View
+    ///
+    /// This function will only be called when initializing this class.
+    /// So, it will initialize self.layout, self.collectionView and add self.collectionView to subviews;
+    /// No cell class will register on collection view, because itemCount == 0; 
+    ///
+    private func initialization() {
+        let flow = UICollectionViewFlowLayout()
+        flow.itemSize = frame.size
+        flow.minimumLineSpacing = 0.0
+        flow.scrollDirection = .horizontal
+        
+        layout = flow
+        collectionView = setupCollectionView(withLayout: flow)
+        
+        pageControl = ProgressPageControl(frame: CGRect(x: 0.0, y: bounds.height - 24.0 - 8.0, width: bounds.width, height: 24.0))
+        pageControl.backgroundColor = UIColor.clear
+        addSubview(pageControl)
+        
+        pageControl.selectedAction = { [weak self] (_ control: ProgressPageControl, _ atIndex: Int) -> () in
+            /// cancel current animation
+            control.cancelAnimation()
+            guard let sself = self else {
+                return
+            }
+            sself.invalidTimer()
+            
+            let curr = sself.currentIndex()
+            let itemIndex = sself.itemIndex(with: curr)
+            var target = 0
+            if itemIndex > atIndex  {
+                target = curr - (itemIndex - atIndex)
+            } else {
+                target = curr + (atIndex - itemIndex)
+            }
+            
+            sself.update(to: target, false)
+            
+            sself.fireTimer()
+        }
+    }
+    /// create a new UICollectionView instance, and add it to super view(self)
+    private func setupCollectionView<T: UICollectionViewLayout>(withLayout layout: T) -> UICollectionView where T: BannerLayout {
+        let cv: UICollectionView = UICollectionView(frame: bounds, collectionViewLayout: layout)
+        cv.backgroundColor = UIColor.clear
+        cv.isPagingEnabled = true
+        cv.showsVerticalScrollIndicator = false
+        cv.showsHorizontalScrollIndicator = false
+        cv.scrollsToTop = false
+        cv.dataSource = self
+        cv.delegate = self
+        addSubview(cv)
+        return cv
+    }
+    /// clean up refercence
+    private func cleanupCollectionView() {
+        if let cv = collectionView {
+            cv.dataSource = nil
+            cv.delegate = nil
+            cv.removeFromSuperview()
+        }
+        collectionView = nil
+    }
+    private func cleanupPageControl() {
+        if let _ = pageControl {
+            pageControl.selectedAction = nil
+            pageControl.removeFromSuperview()
+            pageControl = nil
+        }
+    }
+    private func cleanupLayout() {
+        layout = nil
+    }
+    /// Register cell class
+    ///
+    /// Make collectionView register cell classes from items
+    ///
+    private func registerCells() {
+        guard let c = collectionView else {
+            return
+        }
+        items.forEach { (configurator) in
+            c.register(configurator.cellClass, forCellWithReuseIdentifier: configurator.reuseIdentifier)
+        }
+    }
+    /// Update to new layout
+    ///
+    /// This function will recreate a collectionView instance with new layout type
+    ///
+    private func updateLayout() {
+        guard let c = collectionView, layout is UICollectionViewLayout else {
+            return
+        }
+        invalidTimer()
+        c.collectionViewLayout = (layout as! UICollectionViewLayout)
+        c.reloadData()
+        fireTimer()
+    }
     
     /// scroll
     ///
-    func update(items newItems: [String]) {
+    /// Begin scroll depends on items: show its images or texts
+    ///
+    func scroll() {
+        guard let c = collectionView, let p = pageControl, items.count > 0 else {
+            print("scroll: invalid parameter")
+            return
+        }
         invalidTimer()
         
-        items = newItems
-        if items.count < 2 {
-            collectionView.isScrollEnabled = false
+        p.numberOfpages = items.count
+        
+        if items.count == 1 {
+            c.isScrollEnabled = false
+            registerCells()
+            c.reloadData()
+            p.hideForSingle = true
         } else {
-            itemCount = items.count * 100
-            collectionView.isScrollEnabled = true
+            itemCount = items.count * contentExpendFactor
+            
+            c.isScrollEnabled = true
+            registerCells()
+            c.reloadData()
+            
+            p.hideForSingle = false
+            
             fireTimer()
         }
-        
-        collectionView.reloadData()
     }
-    
+    /// Reset layout and reload data
+    func update<T: UICollectionViewLayout>(bannerLayout newLayout: T) where T: BannerLayout {
+        layout = newLayout
+    }
+    /// Reset items and begin scroll
+    func update(items newItems: [CellConfigurable]) {
+        items = newItems
+    }
+    /// scroll collectionView to target index
     func update(to targetIndex: Int, _ animated: Bool = true) {
+        guard collectionView != nil else {
+            return
+        }
         var targetIndex = targetIndex
         var animated = animated
-        let pos: UICollectionViewScrollPosition = scrollDirection == .horizontal ?
+        let pos: UICollectionViewScrollPosition = layout.scrollDirection == .horizontal ?
             .centeredHorizontally :
             .centeredVertically
-        
         if targetIndex >= itemCount {
             targetIndex = itemCount / 2
             animated = false
@@ -201,68 +243,60 @@ class ScrollBannerView: UIView {
         collectionView.scrollToItem(at: IndexPath(item: targetIndex, section: 0), at: pos, animated: animated)
     }
     
+    /// calculate index for cell
     func currentIndex() -> Int {
+        guard collectionView != nil else {
+            return 0
+        }
         var index: CGFloat = 0.0
         guard collectionView.bounds.width > 0.0 && collectionView.bounds.height > 0.0 else {
             return Int(index)
         }
-        switch scrollDirection {
-        case .horizontal:
-            index = (collectionView.contentOffset.x + flowLayout.itemSize.width * 0.5) / flowLayout.itemSize.width
-        case .vertical:
-            index = (collectionView.contentOffset.y + flowLayout.itemSize.height * 0.5) / flowLayout.itemSize.height
-        }
+        index = layout.scrollDirection == .horizontal ?
+            ((collectionView.contentOffset.x + layout.itemSize.width * 0.5) / layout.itemSize.width) :
+            ((collectionView.contentOffset.y + layout.itemSize.height * 0.5) / layout.itemSize.height)
         return max(0, Int(index))
     }
     
-    func itemIndex(with cellIndex: IndexPath) -> Int {
-        return cellIndex.item % items.count
-    }
-    
-    /// resource
-    ///
-    func localImage(named name: String) -> UIImage? {
-        var path = Bundle.main.path(forResource: name, ofType: "png")
-        if path == nil {
-            path = Bundle.main.path(forResource: name, ofType: "jpg")
-        }
-        if let p = path {
-            return UIImage(contentsOfFile: p)
-        } else {
-            return UIImage(contentsOfFile: Bundle.main.path(forResource: "placeholder", ofType: "jpg")!)
-        }
+    /// calculate index for data
+    func itemIndex(with cellIndex: Int) -> Int {
+        return cellIndex % items.count
     }
 }
 
 
+/// UICollectionViewDataSource
+///
+/// Layout cells with data source
+///
 extension ScrollBannerView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return itemCount
     }
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ScrollBannerCell.ReuseID.id, for: indexPath)
-        let name = items[itemIndex(with: indexPath)]
+        let configurator = items[itemIndex(with: indexPath.item)]
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: configurator.reuseIdentifier, for: indexPath)
         
-        if cell is ScrollBannerCell {
-            if name.hasPrefix("http") || name.hasPrefix("www") {
-                
-            } else {
-                (cell as! ScrollBannerCell).imageView?.image = localImage(named: name)
-            }
-        }
+        configurator.update(cell: cell)
         
         return cell
     }
-    
 }
 
-
+/// UICollectionViewDelegate
+///
+/// Handle select action;
+/// Handle scroll drag action;
+///
 extension ScrollBannerView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
     }
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        
+        guard items.isEmpty == false else {
+            return
+        }
+        pageControl.currentPage = itemIndex(with: currentIndex() )
     }
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         guard itemCount > 1 && scrollView.isScrollEnabled else {

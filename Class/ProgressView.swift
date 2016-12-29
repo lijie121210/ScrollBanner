@@ -41,7 +41,7 @@ class ProgressView: UIView, CAAnimationDelegate {
         let end = CABasicAnimation(keyPath: "strokeEnd")
         end.fromValue = 0.001
         end.toValue = 1.001
-        end.duration = 2.8
+        end.duration = 2.7
         end.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionLinear)
         end.isRemovedOnCompletion = true
         

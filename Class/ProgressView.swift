@@ -36,7 +36,6 @@ class ProgressView: UIView, CAAnimationDelegate {
         layer.path = path.cgPath
         layer.lineWidth = frame.height
         layer.fillColor = UIColor.clear.cgColor
-        layer.strokeColor = UIColor.white.cgColor
         layer.strokeEnd = 0.001
         
         let end = CABasicAnimation(keyPath: "strokeEnd")
@@ -54,9 +53,7 @@ class ProgressView: UIView, CAAnimationDelegate {
         
         endanimate.delegate = self
         
-        self.layer.addSublayer(bar)
-        
-        backgroundColor = UIColor(white: 0.8, alpha: 0.9)
+        self.layer.addSublayer(bar)        
     }
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

@@ -53,6 +53,8 @@ extension BannerIndicatorAsidePosition {
 /// - index : Selected this index or scrolled to this index
 typealias BannerAction = (_ banner: ScrollBannerView, _ index: Int) -> ()
 
+
+
 /// Banner
 ///
 class ScrollBannerView: UIView {
@@ -92,10 +94,10 @@ class ScrollBannerView: UIView {
             isSkip = pageControlAsidePosition == newValue
         }
         didSet {
-            guard let p = pageControl, isSkip == false else {
+            guard isSkip == false else {
                 return
             }
-            p.frame = pageControlFrame
+            updatePageControlPosition()
         }
     }
     
@@ -187,7 +189,7 @@ class ScrollBannerView: UIView {
     }
     
     
-    /// Setup
+    /// Set up views
     
     private func setupCollectionView<T: UICollectionViewLayout>(withLayout layout: T) -> UICollectionView where T: BannerLayout {
         let cv: UICollectionView = UICollectionView(frame: bounds, collectionViewLayout: layout)
@@ -287,10 +289,25 @@ class ScrollBannerView: UIView {
         fireTimer()
     }
     
+    
+    private func updatePageControlPosition() {
+        guard let p = pageControl, isSkip == false else {
+            return
+        }
+        p.disableAnimation()
+        
+        p.frame = pageControlFrame
+        
+        p.enableAnimation()
+    }
+    
+    
     /// Reset layout and reload data
     func update<T: UICollectionViewLayout>(bannerLayout newLayout: T) where T: BannerLayout {
         layout = newLayout
     }
+    
+    
     /// Reset items and begin scroll
     func update(items newItems: [CellConfigurable]) {
         items = newItems

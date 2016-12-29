@@ -32,6 +32,30 @@ class ProgressPageControl: UIControl {
         }
     }
     
+    /// Update apperence
+    
+    var indicatorTintColor: UIColor = UIColor(white: 0.9, alpha: 0.9) {
+        didSet {
+            guard items.isEmpty == false else {
+                return
+            }
+            items.forEach { (p) in
+                p.backgroundColor = indicatorTintColor
+            }
+        }
+    }
+    
+    var indicatorTrackingColor: UIColor = UIColor.gray {
+        didSet {
+            guard items.isEmpty == false else {
+                return
+            }
+            items.forEach { (p) in
+                p.bar.strokeColor = indicatorTrackingColor.cgColor
+            }
+        }
+    }
+    
     var numberOfpages: Int = 0 {
         willSet {
             cleanupIndicator()
@@ -171,6 +195,8 @@ class ProgressPageControl: UIControl {
     /// create a UIProgressView instance and add it to super view (self)
     private func createIndicator() -> ProgressView {
         let p = ProgressView(frame: CGRect(origin: CGPoint.zero, size: indicatorSize))
+        p.backgroundColor = indicatorTintColor
+        p.bar.strokeColor = indicatorTrackingColor.cgColor
         addSubview(p)
         return p
     }
@@ -182,6 +208,7 @@ class ProgressPageControl: UIControl {
         items.forEach { $0.removeFromSuperview() }
         items.removeAll()
     }
+    
     
     /// Update frame
     

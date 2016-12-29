@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		18092EBF1E124055005152B7 /* Compatible.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18092EBE1E124055005152B7 /* Compatible.swift */; };
+		18092EBF1E124055005152B7 /* CellConfigurable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18092EBE1E124055005152B7 /* CellConfigurable.swift */; };
 		18092EC11E124180005152B7 /* BannerImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18092EC01E124180005152B7 /* BannerImageCell.swift */; };
 		18092EC31E12625F005152B7 /* ProgressPageControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18092EC21E12625F005152B7 /* ProgressPageControl.swift */; };
 		182529A41E10B9B000E157D6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182529A31E10B9B000E157D6 /* AppDelegate.swift */; };
@@ -23,6 +23,8 @@
 		182529D81E1134E900E157D6 /* img3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 182529D51E1134E900E157D6 /* img3.jpg */; };
 		182529DA1E11411400E157D6 /* placeholder.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 182529D91E11411400E157D6 /* placeholder.jpg */; };
 		18AB20EB1E135F9E008933FD /* ProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18AB20EA1E135F9E008933FD /* ProgressView.swift */; };
+		18AB331F1E14BFC100B0CD41 /* BannerLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18AB331E1E14BFC100B0CD41 /* BannerLayout.swift */; };
+		18AB33211E1504CF00B0CD41 /* UIView+Frame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18AB33201E1504CF00B0CD41 /* UIView+Frame.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,7 +45,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		18092EBE1E124055005152B7 /* Compatible.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Compatible.swift; path = Class/Compatible.swift; sourceTree = SOURCE_ROOT; };
+		18092EBE1E124055005152B7 /* CellConfigurable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CellConfigurable.swift; path = Class/CellConfigurable.swift; sourceTree = SOURCE_ROOT; };
 		18092EC01E124180005152B7 /* BannerImageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BannerImageCell.swift; path = Class/BannerImageCell.swift; sourceTree = SOURCE_ROOT; };
 		18092EC21E12625F005152B7 /* ProgressPageControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProgressPageControl.swift; path = Class/ProgressPageControl.swift; sourceTree = SOURCE_ROOT; };
 		182529A01E10B9B000E157D6 /* ScrollBanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScrollBanner.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -65,6 +67,8 @@
 		182529D51E1134E900E157D6 /* img3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = img3.jpg; sourceTree = "<group>"; };
 		182529D91E11411400E157D6 /* placeholder.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = placeholder.jpg; sourceTree = "<group>"; };
 		18AB20EA1E135F9E008933FD /* ProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProgressView.swift; path = Class/ProgressView.swift; sourceTree = SOURCE_ROOT; };
+		18AB331E1E14BFC100B0CD41 /* BannerLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BannerLayout.swift; path = Class/BannerLayout.swift; sourceTree = SOURCE_ROOT; };
+		18AB33201E1504CF00B0CD41 /* UIView+Frame.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "UIView+Frame.swift"; path = "Class/UIView+Frame.swift"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -117,11 +121,13 @@
 			children = (
 				182529A31E10B9B000E157D6 /* AppDelegate.swift */,
 				182529A51E10B9B000E157D6 /* ViewController.swift */,
-				18092EBE1E124055005152B7 /* Compatible.swift */,
+				18092EBE1E124055005152B7 /* CellConfigurable.swift */,
 				18092EC01E124180005152B7 /* BannerImageCell.swift */,
 				18AB20EA1E135F9E008933FD /* ProgressView.swift */,
 				18092EC21E12625F005152B7 /* ProgressPageControl.swift */,
+				18AB331E1E14BFC100B0CD41 /* BannerLayout.swift */,
 				182529D11E10BAE500E157D6 /* ScrollBannerView.swift */,
+				18AB33201E1504CF00B0CD41 /* UIView+Frame.swift */,
 				182529A71E10B9B000E157D6 /* Main.storyboard */,
 				182529AA1E10B9B000E157D6 /* Assets.xcassets */,
 				182529AC1E10B9B000E157D6 /* LaunchScreen.storyboard */,
@@ -291,12 +297,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				18092EC31E12625F005152B7 /* ProgressPageControl.swift in Sources */,
+				18AB331F1E14BFC100B0CD41 /* BannerLayout.swift in Sources */,
 				182529D21E10BAE500E157D6 /* ScrollBannerView.swift in Sources */,
 				182529A61E10B9B000E157D6 /* ViewController.swift in Sources */,
 				182529A41E10B9B000E157D6 /* AppDelegate.swift in Sources */,
+				18AB33211E1504CF00B0CD41 /* UIView+Frame.swift in Sources */,
 				18AB20EB1E135F9E008933FD /* ProgressView.swift in Sources */,
 				18092EC11E124180005152B7 /* BannerImageCell.swift in Sources */,
-				18092EBF1E124055005152B7 /* Compatible.swift in Sources */,
+				18092EBF1E124055005152B7 /* CellConfigurable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

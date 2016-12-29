@@ -9,26 +9,6 @@
 import Foundation
 import UIKit
 
-
-
-/// Protocal
-///
-/// Basic requirement for layout using in Banner View
-///
-protocol BannerLayout {
-    var itemSize: CGSize {get set}
-    var scrollDirection: UICollectionViewScrollDirection {get set}
-    var minimumLineSpacing: CGFloat {get set}
-    var minimumInteritemSpacing: CGFloat {get set}
-}
-
-
-extension UICollectionViewFlowLayout: BannerLayout {
-    
-}
-
-
-
 /// Thanks to https://github.com/fastred/ConfigurableTableViewController
 ///
 /// Protocal

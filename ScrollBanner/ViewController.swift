@@ -55,11 +55,17 @@ class ViewController: UIViewController {
     }
 
     @IBAction func changeDirectionToH(_ sender: Any) {
-        let flow = UICollectionViewFlowLayout()
-        flow.itemSize = CGSize(width: view.bounds.width, height: 300.0)
-        flow.minimumLineSpacing = 0.0
-        flow.scrollDirection = .horizontal
-        testV.update(bannerLayout: flow)
+//        let flow = UICollectionViewFlowLayout()
+//        flow.itemSize = CGSize(width: view.bounds.width, height: 300.0)
+//        flow.minimumLineSpacing = 0.0
+//        flow.scrollDirection = .horizontal
+//        testV.update(bannerLayout: flow)
+        
+//        testV.pageControl.frame = CGRect(x: 0, y: 0, width: 24, height: 300)
+        
+//        testV.pageControlAsidePosition = .top(tOffset: 8.0)
+//        testV.pageControlAsidePosition = .right(rOffset: 8.0)
+        testV.pageControlAsidePosition = .left(lOffset: 8.0)
         
     }
     @IBAction func destroyBanner(_ sender: Any) {

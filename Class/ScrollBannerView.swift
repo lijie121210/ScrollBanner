@@ -8,31 +8,100 @@
 
 import UIKit
 
+//case vertical
+
+//case horizontal
+
+enum BannerIndicatorAsidePosition: Equatable {
+    
+    case top(tOffset: CGFloat)
+    
+    case bottom(bOffset: CGFloat)
+    
+    case left(lOffset: CGFloat)
+    
+    case right(rOffset: CGFloat)
+    
+    static func ==(lhs: BannerIndicatorAsidePosition, rhs: BannerIndicatorAsidePosition) -> Bool {
+        switch (lhs, rhs) {
+        case (.top(let a), .top(let b)) where a == b: return true
+        case (.bottom(let a), .bottom(let b)) where a == b: return true
+        case (.left(let a), .left(let b)) where a == b: return true
+        case (.right(let a), .right(let b)) where a == b: return true
+        default:
+            return false
+        }
+    }
+}
+
+
 
 /// Banner
 ///
 class ScrollBannerView: UIView {
     
-    var timer: Timer!
-    var collectionView: UICollectionView!
-    var pageControl: ProgressPageControl!
+    private var timer: Timer!
     
-    var layout: BannerLayout! {
-        didSet {
-            updateLayout()
-        }
-    }
+    /// itemCount = items.count * contentExpendFactor
+    
+    fileprivate var itemCount: Int = 0
+    
+    fileprivate let contentExpendFactor: Int = 50
+    
+    
     var items: [CellConfigurable] = [] {
         didSet {
             scroll()
         }
     }
     
-    var itemCount: Int = 0
-    let contentExpendFactor: Int = 50
+    var collectionView: UICollectionView!
+    
+    var layout: BannerLayout! {
+        didSet {
+            updateLayout()
+        }
+    }
+    
+    var pageControl: ProgressPageControl!
+    
+    fileprivate var isSkip: Bool = false
+
+    fileprivate var pageControlLength: CGFloat = 20.0
+
+    fileprivate var pageControlFrame: CGRect {
+        var result: CGRect = CGRect.zero
+        let len: CGFloat = pageControlLength
+        switch pageControlAsidePosition {
+        case .top(let tOffset): result = CGRect(x: 0.0, y: tOffset, width: bounds.width, height: len)
+        case .bottom(let bOffset): result = CGRect(x: 0.0, y: bounds.height - len - bOffset, width: bounds.width, height: len)
+        case .left(let lOffset): result = CGRect(x: lOffset, y: 0, width: len, height: bounds.height)
+        case .right(let rOffset): result = CGRect(x: bounds.width - len - rOffset, y: 0, width: len, height: bounds.height)
+        }
+        return result
+    }
+    
+    
+    /// Set to change pageControl's position
+    
+    var pageControlAsidePosition: BannerIndicatorAsidePosition = .bottom(bOffset: 8.0) {
+        willSet {
+            isSkip = pageControlAsidePosition == newValue
+        }
+        didSet {
+            guard let p = pageControl, isSkip == false else {
+                return
+            }
+            p.frame = pageControlFrame
+        }
+    }
+    
+    /// Life cycle
     
     deinit {
-        print("ScrollBannerView.deinit", collectionView == nil)
+        print(collectionView == nil ? "collectionView.deinit" : "Error collectionView!")
+        print(pageControl == nil ? "pageControl.deinit" : "Error pageControl!")
+        print("ScrollBannerView.deinit")
     }
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -50,7 +119,7 @@ class ScrollBannerView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         layout.itemSize = frame.size
-        update(to: itemCount / 2, false)
+        scroll(to: itemCount / 2, false)
     }
     override func willMove(toSuperview newSuperview: UIView?) {
         guard newSuperview == nil else {
@@ -59,13 +128,14 @@ class ScrollBannerView: UIView {
         print("removed from superview")
         invalidTimer()
         cleanupCollectionView()
+        cleanupPageControl()
         cleanupLayout()
     }
     
     /// timer
     ///
     /// recreate a new timer instance
-    func fireTimer() {
+    fileprivate func fireTimer() {
         invalidTimer()
         timer = Timer.scheduledTimer(timeInterval: 3.0,
                                      target: self,
@@ -74,7 +144,7 @@ class ScrollBannerView: UIView {
                                      repeats: true)
     }
     /// destroy this timer
-    func invalidTimer() {
+    fileprivate func invalidTimer() {
         if let t = timer, t.isValid {
             timer.invalidate()
             timer = nil
@@ -85,7 +155,7 @@ class ScrollBannerView: UIView {
         guard itemCount > 1 else {
             return
         }
-        update(to: currentIndex() + 1)
+        scroll(to: currentIndex() + 1)
     }
     
     /// Collection View
@@ -95,21 +165,46 @@ class ScrollBannerView: UIView {
     /// No cell class will register on collection view, because itemCount == 0; 
     ///
     private func initialization() {
+        
+        let flow = setupDefaultLayout()
+        layout = flow
+        
+        collectionView = setupCollectionView(withLayout: flow)
+        
+        pageControl = setupPageControl()
+    }
+    
+    
+    /// Setup
+    
+    private func setupCollectionView<T: UICollectionViewLayout>(withLayout layout: T) -> UICollectionView where T: BannerLayout {
+        let cv: UICollectionView = UICollectionView(frame: bounds, collectionViewLayout: layout)
+        cv.backgroundColor = UIColor.clear
+        cv.isPagingEnabled = true
+        cv.showsVerticalScrollIndicator = false
+        cv.showsHorizontalScrollIndicator = false
+        cv.scrollsToTop = false
+        cv.dataSource = self
+        cv.delegate = self
+        addSubview(cv)
+        return cv
+    }
+    private func setupDefaultLayout() -> UICollectionViewFlowLayout {
         let flow = UICollectionViewFlowLayout()
         flow.itemSize = frame.size
         flow.minimumLineSpacing = 0.0
         flow.scrollDirection = .horizontal
+        return flow
+    }
+    private func setupPageControl() -> ProgressPageControl {
+        let control = ProgressPageControl(frame: pageControlFrame)
+        control.backgroundColor = UIColor.clear
+        addSubview(control)
         
-        layout = flow
-        collectionView = setupCollectionView(withLayout: flow)
-        
-        pageControl = ProgressPageControl(frame: CGRect(x: 0.0, y: bounds.height - 24.0 - 8.0, width: bounds.width, height: 24.0))
-        pageControl.backgroundColor = UIColor.clear
-        addSubview(pageControl)
-        
-        pageControl.selectedAction = { [weak self] (_ control: ProgressPageControl, _ atIndex: Int) -> () in
+        control.selectedAction = { [weak self] (_ control: ProgressPageControl, _ atIndex: Int) -> () in
             /// cancel current animation
-            control.cancelAnimation()
+            control.disableAnimation()
+            
             guard let sself = self else {
                 return
             }
@@ -124,25 +219,15 @@ class ScrollBannerView: UIView {
                 target = curr + (atIndex - itemIndex)
             }
             
-            sself.update(to: target, false)
+            sself.scroll(to: target, false)
             
             sself.fireTimer()
         }
+        return control
     }
-    /// create a new UICollectionView instance, and add it to super view(self)
-    private func setupCollectionView<T: UICollectionViewLayout>(withLayout layout: T) -> UICollectionView where T: BannerLayout {
-        let cv: UICollectionView = UICollectionView(frame: bounds, collectionViewLayout: layout)
-        cv.backgroundColor = UIColor.clear
-        cv.isPagingEnabled = true
-        cv.showsVerticalScrollIndicator = false
-        cv.showsHorizontalScrollIndicator = false
-        cv.scrollsToTop = false
-        cv.dataSource = self
-        cv.delegate = self
-        addSubview(cv)
-        return cv
-    }
-    /// clean up refercence
+    
+    /// Clean up refercence
+    
     private func cleanupCollectionView() {
         if let cv = collectionView {
             cv.dataSource = nil
@@ -161,6 +246,8 @@ class ScrollBannerView: UIView {
     private func cleanupLayout() {
         layout = nil
     }
+    
+    
     /// Register cell class
     ///
     /// Make collectionView register cell classes from items
@@ -173,6 +260,7 @@ class ScrollBannerView: UIView {
             c.register(configurator.cellClass, forCellWithReuseIdentifier: configurator.reuseIdentifier)
         }
     }
+    
     /// Update to new layout
     ///
     /// This function will recreate a collectionView instance with new layout type
@@ -186,6 +274,16 @@ class ScrollBannerView: UIView {
         c.reloadData()
         fireTimer()
     }
+    
+    /// Reset layout and reload data
+    func update<T: UICollectionViewLayout>(bannerLayout newLayout: T) where T: BannerLayout {
+        layout = newLayout
+    }
+    /// Reset items and begin scroll
+    func update(items newItems: [CellConfigurable]) {
+        items = newItems
+    }
+    
     
     /// scroll
     ///
@@ -204,7 +302,6 @@ class ScrollBannerView: UIView {
             c.isScrollEnabled = false
             registerCells()
             c.reloadData()
-            p.hideForSingle = true
         } else {
             itemCount = items.count * contentExpendFactor
             
@@ -212,35 +309,8 @@ class ScrollBannerView: UIView {
             registerCells()
             c.reloadData()
             
-            p.hideForSingle = false
-            
             fireTimer()
         }
-    }
-    /// Reset layout and reload data
-    func update<T: UICollectionViewLayout>(bannerLayout newLayout: T) where T: BannerLayout {
-        layout = newLayout
-    }
-    /// Reset items and begin scroll
-    func update(items newItems: [CellConfigurable]) {
-        items = newItems
-    }
-    /// scroll collectionView to target index
-    func update(to targetIndex: Int, _ animated: Bool = true) {
-        guard collectionView != nil else {
-            return
-        }
-        var targetIndex = targetIndex
-        var animated = animated
-        let pos: UICollectionViewScrollPosition = layout.scrollDirection == .horizontal ?
-            .centeredHorizontally :
-            .centeredVertically
-        if targetIndex >= itemCount {
-            targetIndex = itemCount / 2
-            animated = false
-        }
-        
-        collectionView.scrollToItem(at: IndexPath(item: targetIndex, section: 0), at: pos, animated: animated)
     }
     
     /// calculate index for cell
@@ -262,6 +332,25 @@ class ScrollBannerView: UIView {
     func itemIndex(with cellIndex: Int) -> Int {
         return cellIndex % items.count
     }
+    
+    /// scroll collectionView to target index
+    func scroll(to targetIndex: Int, _ animated: Bool = true) {
+        guard collectionView != nil else {
+            return
+        }
+        var targetIndex = targetIndex
+        var animated = animated
+        let pos: UICollectionViewScrollPosition = layout.scrollDirection == .horizontal ?
+            .centeredHorizontally :
+            .centeredVertically
+        if targetIndex >= itemCount {
+            targetIndex = itemCount / 2
+            animated = false
+        }
+        
+        collectionView.scrollToItem(at: IndexPath(item: targetIndex, section: 0), at: pos, animated: animated)
+    }
+    
 }
 
 
@@ -303,14 +392,19 @@ extension ScrollBannerView: UICollectionViewDelegate {
             return
         }
         invalidTimer()
+        pageControl.disableAnimation()
     }
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         fireTimer()
+        pageControl.enableAnimation()
     }
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         scrollViewDidEndScrollingAnimation(scrollView)
     }
     func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        guard items.isEmpty == false else {
+            return
+        }
         
     }
     

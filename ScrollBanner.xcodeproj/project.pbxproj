@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		18092EBF1E124055005152B7 /* CellConfigurable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18092EBE1E124055005152B7 /* CellConfigurable.swift */; };
+		18092EBF1E124055005152B7 /* BannerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18092EBE1E124055005152B7 /* BannerCell.swift */; };
 		18092EC11E124180005152B7 /* BannerImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18092EC01E124180005152B7 /* BannerImageCell.swift */; };
 		18092EC31E12625F005152B7 /* ProgressPageControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18092EC21E12625F005152B7 /* ProgressPageControl.swift */; };
 		182529A41E10B9B000E157D6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182529A31E10B9B000E157D6 /* AppDelegate.swift */; };
@@ -45,7 +45,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		18092EBE1E124055005152B7 /* CellConfigurable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CellConfigurable.swift; path = Class/CellConfigurable.swift; sourceTree = SOURCE_ROOT; };
+		18092EBE1E124055005152B7 /* BannerCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BannerCell.swift; path = Class/BannerCell.swift; sourceTree = SOURCE_ROOT; };
 		18092EC01E124180005152B7 /* BannerImageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BannerImageCell.swift; path = Class/BannerImageCell.swift; sourceTree = SOURCE_ROOT; };
 		18092EC21E12625F005152B7 /* ProgressPageControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProgressPageControl.swift; path = Class/ProgressPageControl.swift; sourceTree = SOURCE_ROOT; };
 		182529A01E10B9B000E157D6 /* ScrollBanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScrollBanner.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -121,7 +121,7 @@
 			children = (
 				182529A31E10B9B000E157D6 /* AppDelegate.swift */,
 				182529A51E10B9B000E157D6 /* ViewController.swift */,
-				18092EBE1E124055005152B7 /* CellConfigurable.swift */,
+				18092EBE1E124055005152B7 /* BannerCell.swift */,
 				18092EC01E124180005152B7 /* BannerImageCell.swift */,
 				18AB20EA1E135F9E008933FD /* ProgressView.swift */,
 				18092EC21E12625F005152B7 /* ProgressPageControl.swift */,
@@ -304,7 +304,7 @@
 				18AB33211E1504CF00B0CD41 /* UIView+Frame.swift in Sources */,
 				18AB20EB1E135F9E008933FD /* ProgressView.swift in Sources */,
 				18092EC11E124180005152B7 /* BannerImageCell.swift in Sources */,
-				18092EBF1E124055005152B7 /* CellConfigurable.swift in Sources */,
+				18092EBF1E124055005152B7 /* BannerCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

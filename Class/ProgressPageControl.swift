@@ -18,6 +18,8 @@ typealias ProgressPageControlAction = (_ control: ProgressPageControl, _ atIndex
 ///
 class ProgressPageControl: UIControl {
     
+    private var items:[ProgressView] = []
+
     /// Click action callback
     var selectedAction: ProgressPageControlAction?
     
@@ -113,6 +115,7 @@ class ProgressPageControl: UIControl {
         
         return CGFloat(numberOfpages) * ( result + lineSpace) - lineSpace
     }
+
     
     override var frame: CGRect {
         didSet {
@@ -122,12 +125,15 @@ class ProgressPageControl: UIControl {
         }
     }
     
-    
-    private var items:[ProgressView] = []
 
-    
     deinit {
         print("ProgressPageControl.deinit")
+    }
+    
+    override func willMove(toSuperview newSuperview: UIView?) {        
+        if newSuperview == nil {
+            cleanupIndicator()
+        }
     }
     
     /// Touch event

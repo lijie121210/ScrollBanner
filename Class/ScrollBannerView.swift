@@ -8,9 +8,6 @@
 
 import UIKit
 
-//case vertical
-
-//case horizontal
 
 enum BannerIndicatorAsidePosition: Equatable {
     
@@ -35,6 +32,26 @@ enum BannerIndicatorAsidePosition: Equatable {
 }
 
 
+extension BannerIndicatorAsidePosition {
+    
+    func asideFrame(baseSize size: CGSize) -> CGRect {
+        var result: CGRect = CGRect.zero
+        let len: CGFloat = 20.0
+        switch self {
+        case .top(let tOffset): result = CGRect(x: 0.0, y: tOffset, width: size.width, height: len)
+        case .bottom(let bOffset): result = CGRect(x: 0.0, y: size.height - len - bOffset, width: size.width, height: len)
+        case .left(let lOffset): result = CGRect(x: lOffset, y: 0, width: len, height: size.height)
+        case .right(let rOffset): result = CGRect(x: size.width - len - rOffset, y: 0, width: len, height: size.height)
+        }
+        return result
+    }
+    
+}
+
+
+/// - banner: Scroll banner view
+/// - index : Selected this index or scrolled to this index
+typealias BannerAction = (_ banner: ScrollBannerView, _ index: Int) -> ()
 
 /// Banner
 ///
@@ -42,12 +59,15 @@ class ScrollBannerView: UIView {
     
     private var timer: Timer!
     
+    var selectedAction: BannerAction?
+    
+    var scrolledACtion: BannerAction?
+    
     /// itemCount = items.count * contentExpendFactor
     
     fileprivate var itemCount: Int = 0
     
     fileprivate let contentExpendFactor: Int = 50
-    
     
     var items: [CellConfigurable] = [] {
         didSet {
@@ -66,23 +86,6 @@ class ScrollBannerView: UIView {
     var pageControl: ProgressPageControl!
     
     fileprivate var isSkip: Bool = false
-
-    fileprivate var pageControlLength: CGFloat = 20.0
-
-    fileprivate var pageControlFrame: CGRect {
-        var result: CGRect = CGRect.zero
-        let len: CGFloat = pageControlLength
-        switch pageControlAsidePosition {
-        case .top(let tOffset): result = CGRect(x: 0.0, y: tOffset, width: bounds.width, height: len)
-        case .bottom(let bOffset): result = CGRect(x: 0.0, y: bounds.height - len - bOffset, width: bounds.width, height: len)
-        case .left(let lOffset): result = CGRect(x: lOffset, y: 0, width: len, height: bounds.height)
-        case .right(let rOffset): result = CGRect(x: bounds.width - len - rOffset, y: 0, width: len, height: bounds.height)
-        }
-        return result
-    }
-    
-    
-    /// Set to change pageControl's position
     
     var pageControlAsidePosition: BannerIndicatorAsidePosition = .bottom(bOffset: 8.0) {
         willSet {
@@ -95,6 +98,12 @@ class ScrollBannerView: UIView {
             p.frame = pageControlFrame
         }
     }
+    
+    /// calculate page control's frame depends on pageControlAsidePosition
+    fileprivate var pageControlFrame: CGRect {
+        return pageControlAsidePosition.asideFrame(baseSize: bounds.size)
+    }
+    
     
     /// Life cycle
     
@@ -121,21 +130,24 @@ class ScrollBannerView: UIView {
         layout.itemSize = frame.size
         scroll(to: itemCount / 2, false)
     }
+    
     override func willMove(toSuperview newSuperview: UIView?) {
+        /// removed from superview
         guard newSuperview == nil else {
             return
         }
-        print("removed from superview")
         invalidTimer()
         cleanupCollectionView()
         cleanupPageControl()
         cleanupLayout()
     }
     
+    
+    
     /// timer
     ///
     /// recreate a new timer instance
-    fileprivate func fireTimer() {
+    func fireTimer() {
         invalidTimer()
         timer = Timer.scheduledTimer(timeInterval: 3.0,
                                      target: self,
@@ -144,7 +156,7 @@ class ScrollBannerView: UIView {
                                      repeats: true)
     }
     /// destroy this timer
-    fileprivate func invalidTimer() {
+    func invalidTimer() {
         if let t = timer, t.isValid {
             timer.invalidate()
             timer = nil
@@ -313,7 +325,7 @@ class ScrollBannerView: UIView {
         }
     }
     
-    /// calculate index for cell
+    /// calculate index for cell : 0..<itemCount
     func currentIndex() -> Int {
         guard collectionView != nil else {
             return 0
@@ -328,7 +340,7 @@ class ScrollBannerView: UIView {
         return max(0, Int(index))
     }
     
-    /// calculate index for data
+    /// calculate index for data : 0..<items.count
     func itemIndex(with cellIndex: Int) -> Int {
         return cellIndex % items.count
     }
@@ -354,11 +366,14 @@ class ScrollBannerView: UIView {
 }
 
 
-/// UICollectionViewDataSource
-///
-/// Layout cells with data source
-///
-extension ScrollBannerView: UICollectionViewDataSource {
+
+extension ScrollBannerView: UICollectionViewDataSource, UICollectionViewDelegate {
+    
+    /// UICollectionViewDataSource
+    ///
+    /// Layout cells with data source
+    ///
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return itemCount
     }
@@ -370,16 +385,17 @@ extension ScrollBannerView: UICollectionViewDataSource {
         
         return cell
     }
-}
-
-/// UICollectionViewDelegate
-///
-/// Handle select action;
-/// Handle scroll drag action;
-///
-extension ScrollBannerView: UICollectionViewDelegate {
+    
+    /// UICollectionViewDelegate
+    ///
+    /// Handle select action;
+    /// Handle scroll drag action;
+    ///
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
+        if let action = selectedAction {
+            action(self, itemIndex(with: indexPath.item))
+        }
     }
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         guard items.isEmpty == false else {
@@ -402,10 +418,10 @@ extension ScrollBannerView: UICollectionViewDelegate {
         scrollViewDidEndScrollingAnimation(scrollView)
     }
     func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
-        guard items.isEmpty == false else {
+        guard items.isEmpty == false, let action = scrolledACtion else {
             return
         }
-        
+        action(self, itemIndex(with: currentIndex()))
     }
     
 }

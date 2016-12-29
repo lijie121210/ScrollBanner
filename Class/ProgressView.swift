@@ -10,6 +10,10 @@ import UIKit
 
 class ProgressView: UIView, CAAnimationDelegate {
     
+    struct AnimateKey {
+        static let strokeEnd = "end_animate_key"
+    }
+    
     /// Set strokeColor / strokeStart / strokeEnd ...
     var bar: CAShapeLayer
     
@@ -19,10 +23,11 @@ class ProgressView: UIView, CAAnimationDelegate {
     ///
     var isAnimatable: Bool = true
     
-    fileprivate let endAnimateKey: String = "end_animate_key"
+    deinit {
+        print("ProgressView.deinit")
+    }
     
     override init(frame: CGRect) {
-        
         let path = UIBezierPath()
         path.move(to: CGPoint.zero)
         path.addLine(to: CGPoint(x: frame.width, y: 0.0))
@@ -81,6 +86,9 @@ class ProgressView: UIView, CAAnimationDelegate {
     }
     override func willMove(toSuperview newSuperview: UIView?) {
         if newSuperview == nil {
+            
+            endanimate.delegate = nil
+            
             bar.removeAllAnimations()
             bar.removeFromSuperlayer()
         }
@@ -89,21 +97,19 @@ class ProgressView: UIView, CAAnimationDelegate {
     /// For beginning or stopping animation
     
     func animate() {
-        if let _ = bar.animation(forKey: endAnimateKey) {
-            bar.removeAnimation(forKey: endAnimateKey)
+        if let _ = bar.animation(forKey: AnimateKey.strokeEnd) {
+            bar.removeAnimation(forKey: AnimateKey.strokeEnd)
         }
         if isAnimatable {
-            bar.add(endanimate, forKey: endAnimateKey)
+            bar.add(endanimate, forKey: AnimateKey.strokeEnd)
         }
     }
     
     func cancelAnimation() {
-        if let _ = bar.animation(forKey: endAnimateKey) {
-            bar.removeAnimation(forKey: endAnimateKey)
+        if let _ = bar.animation(forKey: AnimateKey.strokeEnd) {
+            bar.removeAnimation(forKey: AnimateKey.strokeEnd)
         }
     }
-    
-    
     
     /// CAAnimationDelegate
     

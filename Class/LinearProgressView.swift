@@ -1,27 +1,71 @@
 //
-//  ProgressView.swift
+//  LinearProgressView.swift
 //  ScrollBanner
 //
-//  Created by jie on 2016/12/28.
+//  Created by jie on 2016/12/30.
 //  Copyright © 2016年 HTIOT.Inc. All rights reserved.
 //
 
 import UIKit
 
-class ProgressView: UIView, CAAnimationDelegate {
+
+extension CAAnimation.AnimateKey {
+    static let strokeEnd = "LinearProgressView_end_animate_key"
+}
+
+extension LinearProgressView: Animateable {
     
-    struct AnimateKey {
-        static let strokeEnd = "end_animate_key"
-    }
+}
+
+extension LinearProgressView: Colorable {
     
-    /// Set strokeColor / strokeStart / strokeEnd ...
+}
+
+class LinearProgressView: UIView, CAAnimationDelegate {
+    
     var bar: CAShapeLayer
-    
-    /// Set duration / timingFunction ...
     var endanimate: CABasicAnimation
     
-    ///
+    var normalTintColor: UIColor? {
+        didSet {
+            backgroundColor = normalTintColor
+        }
+    }
+    
+    var highlightTintColor: UIColor? {
+        didSet {
+            bar.strokeColor = highlightTintColor?.cgColor
+        }
+    }
+    
+    /// Animatable protocal
+    
     var isAnimatable: Bool = true
+    
+    func enable() {
+        if let _ = bar.animation(forKey: CAAnimation.AnimateKey.strokeEnd) {
+            bar.removeAnimation(forKey: CAAnimation.AnimateKey.strokeEnd)
+        }
+        if isAnimatable {
+            bar.add(endanimate, forKey: CAAnimation.AnimateKey.strokeEnd)
+        }
+    }
+    
+    func disable() {
+        if let _ = bar.animation(forKey: CAAnimation.AnimateKey.strokeEnd) {
+            bar.removeAnimation(forKey: CAAnimation.AnimateKey.strokeEnd)
+        }
+    }
+    
+    /// CAAnimationDelegate
+    
+    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+        if anim is CABasicAnimation {
+            bar.strokeEnd = 0.001
+        }
+    }
+    
+    /// Life Cycle
     
     deinit {
         print("ProgressView.deinit")
@@ -46,14 +90,10 @@ class ProgressView: UIView, CAAnimationDelegate {
         end.isRemovedOnCompletion = true
         
         bar = layer
-
         endanimate = end
-        
         super.init(frame: frame)
-        
         endanimate.delegate = self
-        
-        self.layer.addSublayer(bar)        
+        self.layer.addSublayer(bar)
     }
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -71,7 +111,7 @@ class ProgressView: UIView, CAAnimationDelegate {
             f = CGRect(x: 0, y: layer.bounds.height * 0.5, width: layer.bounds.width, height: layer.bounds.height)
             w = layer.bounds.height
             path.addLine(to: CGPoint(x: layer.bounds.width, y: 0.0))
-
+            
         } else {
             f = CGRect(x: layer.bounds.width * 0.5, y: 0, width: layer.bounds.width, height: layer.bounds.height)
             w = layer.bounds.width
@@ -83,36 +123,13 @@ class ProgressView: UIView, CAAnimationDelegate {
     }
     override func willMove(toSuperview newSuperview: UIView?) {
         if newSuperview == nil {
-            
             endanimate.delegate = nil
-            
             bar.removeAllAnimations()
             bar.removeFromSuperlayer()
         }
     }
     
-    /// For beginning or stopping animation
     
-    func enableAnimation() {
-        if let _ = bar.animation(forKey: AnimateKey.strokeEnd) {
-            bar.removeAnimation(forKey: AnimateKey.strokeEnd)
-        }
-        if isAnimatable {
-            bar.add(endanimate, forKey: AnimateKey.strokeEnd)
-        }
-    }
     
-    func disableAnimation() {
-        if let _ = bar.animation(forKey: AnimateKey.strokeEnd) {
-            bar.removeAnimation(forKey: AnimateKey.strokeEnd)
-        }
-    }
-    
-    /// CAAnimationDelegate
-    
-    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-        if anim is CABasicAnimation {
-            bar.strokeEnd = 0.001
-        }
-    }
+
 }

@@ -11,7 +11,7 @@ import UIKit
 class ViewController: UIViewController {
 
     var test: ScrollBannerView!
-    var testV: ScrollBannerView!
+    var testV: ScrollBanner!
     var p: UIProgressView!
     
     override func viewDidLoad() {
@@ -26,7 +26,7 @@ class ViewController: UIViewController {
         let img3 = UIImage(contentsOfFile: path3)!
         
         test = ScrollBannerView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 300.0))
-        view.addSubview(test)
+//        view.addSubview(test)
         
         test.update(items: [
             CellConfigurator<BannerImageCell>(viewData: BannerImageCellData(image: img1)),
@@ -35,9 +35,9 @@ class ViewController: UIViewController {
             ])
         
         
-        testV = ScrollBannerView(frame: CGRect(x: 0, y: 320.0, width: view.bounds.width, height: 300.0))
-        testV.layout.scrollDirection = .vertical
-//        view.addSubview(testV)
+        testV = ScrollBanner(frame: CGRect(x: 0, y: 320.0, width: view.bounds.width, height: 300.0))
+//        testV.layout.scrollDirection = .vertical
+        view.addSubview(testV)
         
         testV.update(items: [
             CellConfigurator<BannerImageCell>(viewData: BannerImageCellData(image: img1)),

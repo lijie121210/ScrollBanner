@@ -19,15 +19,15 @@ typealias ProgressPageControlAction = (_ control: ProgressPageControl, _ atIndex
 class ProgressPageControl: UIControl {
     
     /// Saving all indicators
-    private var items:[ProgressView] = []
+    fileprivate var items:[ProgressView] = []
 
     /// Click action callback
     var selectedAction: ProgressPageControlAction?
     
     
     var lineSpace: CGFloat = 8.0 {
-        willSet {
-            if newValue != lineSpace {
+        didSet {
+            if oldValue != lineSpace {
                 updateIndicatorFrame()
             }
         }
@@ -35,42 +35,45 @@ class ProgressPageControl: UIControl {
     
     /// Update apperence
     
-    var indicatorTintColor: UIColor = UIColor(white: 0.9, alpha: 0.9) {
+    var hidesForSinglePage: Bool = false {
+        didSet {
+            checkHidesForSinglePage()
+        }
+    }
+    
+    var pageIndicatorTintColor: UIColor? = UIColor(white: 0.9, alpha: 0.9) {
         didSet {
             guard items.isEmpty == false else {
                 return
             }
             items.forEach { (p) in
-                p.backgroundColor = indicatorTintColor
+                p.backgroundColor = pageIndicatorTintColor
             }
         }
     }
     
-    var indicatorTrackingColor: UIColor = UIColor.gray {
+    var currentPageIndicatorTintColor: UIColor? = UIColor.gray {
         didSet {
             guard items.isEmpty == false else {
                 return
             }
             items.forEach { (p) in
-                p.bar.strokeColor = indicatorTrackingColor.cgColor
+                p.bar.strokeColor = currentPageIndicatorTintColor?.cgColor
             }
         }
     }
     
-    var numberOfpages: Int = 0 {
+    var numberOfPages: Int = 0 {
         willSet {
             cleanupIndicator()
         }
         didSet {
-            for _ in 0 ..< numberOfpages {
+            for _ in 0 ..< numberOfPages {
                 items.append( createIndicator() )
             }
-            
             updateIndicatorFrame()
             
-            if numberOfpages == 1 {
-                isHidden = true
-            }
+            checkHidesForSinglePage()
         }
     }
     
@@ -79,8 +82,8 @@ class ProgressPageControl: UIControl {
             guard currentPage != oldValue && currentPage >= 0 && currentPage < items.count else {
                 return
             }
-            items[oldValue > 0 ? oldValue : 0].cancelAnimation()
-            items[currentPage].animate()
+            items[oldValue > 0 ? oldValue : 0].disableAnimation()
+            items[currentPage].enableAnimation()
         }
     }
     
@@ -89,13 +92,31 @@ class ProgressPageControl: UIControl {
     }
 
     /// Height for each indicator
-    var indicatorLength: CGFloat = 2.0
+    var indicatorLength: CGFloat = 2.0 {
+        didSet {
+            if oldValue != indicatorLength {
+                updateIndicatorFrame()
+            }
+        }
+    }
     
     /// Limit width for each indicator
-    var indicatorContentWidthLimit: CGFloat = 60.0
+    var indicatorContentWidthLimit: CGFloat = 60.0 {
+        didSet {
+            if oldValue != indicatorContentWidthLimit {
+                updateIndicatorFrame()
+            }
+        }
+    }
     
     /// Limit height for each indicator
-    var indicatorContentHeightLimit: CGFloat = 60.0
+    var indicatorContentHeightLimit: CGFloat = 60.0 {
+        didSet {
+            if oldValue != indicatorContentHeightLimit {
+                updateIndicatorFrame()
+            }
+        }
+    }
     
     /// Size for each indicator
     ///
@@ -104,16 +125,16 @@ class ProgressPageControl: UIControl {
         var resultW: CGFloat = indicatorLength
         var resultH: CGFloat = indicatorLength
         
-        if (numberOfpages == 0) {
+        if (numberOfPages == 0) {
             return CGSize.zero
         }
         
         switch layoutDirection {
         case .horizontal:
-            let width = max( 0.0, ( bounds.width - lineSpace * CGFloat(numberOfpages + 1) ) ) / CGFloat(numberOfpages)
+            let width = max( 0.0, ( bounds.width - lineSpace * CGFloat(numberOfPages + 1) ) ) / CGFloat(numberOfPages)
             resultW = min(width, indicatorContentWidthLimit)
         case .vertical:
-            let height = max( 0.0, ( bounds.height - lineSpace * CGFloat(numberOfpages + 1) ) ) / CGFloat(numberOfpages)
+            let height = max( 0.0, ( bounds.height - lineSpace * CGFloat(numberOfPages + 1) ) ) / CGFloat(numberOfPages)
             resultH = min(height, indicatorContentHeightLimit)
         }
         
@@ -122,7 +143,7 @@ class ProgressPageControl: UIControl {
     
     /// Help calculate originX of first indicator
     var indicatorContentLength: CGFloat {
-        if numberOfpages == 0 {
+        if numberOfPages == 0 {
             return 0.0
         }
         var result: CGFloat = 0.0
@@ -134,7 +155,7 @@ class ProgressPageControl: UIControl {
             result = indicatorSize.height
         }
         
-        return CGFloat(numberOfpages) * ( result + lineSpace) - lineSpace
+        return CGFloat(numberOfPages) * ( result + lineSpace) - lineSpace
     }
 
     
@@ -157,6 +178,23 @@ class ProgressPageControl: UIControl {
         }
     }
     
+    /// - return Longest length
+    func size(forNumberOfPages pageCount: Int) -> CGSize {
+        switch layoutDirection {
+        case .horizontal: return CGSize(width: indicatorContentLength, height: indicatorLength)
+        case .vertical: return CGSize(width: indicatorLength, height: indicatorContentLength)
+        }
+    }
+    
+    /// check should hides
+    fileprivate func checkHidesForSinglePage() {
+        if numberOfPages == 1 && hidesForSinglePage {
+            isHidden = true
+        } else {
+            isHidden = false
+        }
+    }
+    
     /// Touch event
     ///
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -175,7 +213,7 @@ class ProgressPageControl: UIControl {
             return
         }
         items.forEach { (p) in
-            p.cancelAnimation()
+            p.disableAnimation()
             p.isAnimatable = false
         }
     }
@@ -190,16 +228,16 @@ class ProgressPageControl: UIControl {
     }
     
     /// create a UIProgressView instance and add it to super view (self)
-    private func createIndicator() -> ProgressView {
+    fileprivate func createIndicator() -> ProgressView {
         let p = ProgressView(frame: CGRect(origin: CGPoint.zero, size: indicatorSize))
-        p.backgroundColor = indicatorTintColor
-        p.bar.strokeColor = indicatorTrackingColor.cgColor
+        p.backgroundColor = pageIndicatorTintColor
+        p.bar.strokeColor = currentPageIndicatorTintColor?.cgColor
         addSubview(p)
         return p
     }
     
-    private func cleanupIndicator() {
-        guard items.isEmpty == false, numberOfpages > 0 else {
+    fileprivate func cleanupIndicator() {
+        guard items.isEmpty == false, numberOfPages > 0 else {
             return
         }
         items.forEach { $0.removeFromSuperview() }
@@ -210,7 +248,7 @@ class ProgressPageControl: UIControl {
     
     /// Update frame
     
-    func updateIndicatorFrame() {
+    fileprivate func updateIndicatorFrame() {
         guard items.isEmpty == false else {
             return
         }
@@ -220,7 +258,7 @@ class ProgressPageControl: UIControl {
     }
     
     /// calculate frame of indicator and update it's frame
-    private func frame(at index: Int) -> CGRect {
+    fileprivate func frame(at index: Int) -> CGRect {
         let size = indicatorSize
         var x: CGFloat = 0.0
         var y: CGFloat = 0.0
@@ -240,8 +278,6 @@ class ProgressPageControl: UIControl {
     
     
 }
-
-
 
 
 

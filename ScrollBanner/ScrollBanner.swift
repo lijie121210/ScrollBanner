@@ -1,69 +1,19 @@
 //
-//  ScrollBannerView.swift
+//  ScrollBanner.swift
 //  ScrollBanner
 //
-//  Created by jie on 2016/12/26.
+//  Created by jie on 2016/12/30.
 //  Copyright © 2016年 HTIOT.Inc. All rights reserved.
 //
 
 import UIKit
 
-
-enum BannerIndicatorAsidePosition: Equatable {
-    
-    case top(tOffset: CGFloat)
-    
-    case bottom(bOffset: CGFloat)
-    
-    case left(lOffset: CGFloat)
-    
-    case right(rOffset: CGFloat)
-    
-    static func ==(lhs: BannerIndicatorAsidePosition, rhs: BannerIndicatorAsidePosition) -> Bool {
-        switch (lhs, rhs) {
-        case (.top(let a), .top(let b)) where a == b: return true
-        case (.bottom(let a), .bottom(let b)) where a == b: return true
-        case (.left(let a), .left(let b)) where a == b: return true
-        case (.right(let a), .right(let b)) where a == b: return true
-        default:
-            return false
-        }
-    }
-}
-
-
-extension BannerIndicatorAsidePosition {
-    
-    func asideFrame(baseSize size: CGSize) -> CGRect {
-        var result: CGRect = CGRect.zero
-        let len: CGFloat = 20.0
-        switch self {
-        case .top(let tOffset): result = CGRect(x: 0.0, y: tOffset, width: size.width, height: len)
-        case .bottom(let bOffset): result = CGRect(x: 0.0, y: size.height - len - bOffset, width: size.width, height: len)
-        case .left(let lOffset): result = CGRect(x: lOffset, y: 0, width: len, height: size.height)
-        case .right(let rOffset): result = CGRect(x: size.width - len - rOffset, y: 0, width: len, height: size.height)
-        }
-        return result
-    }
-    
-}
-
-
-/// - banner: Scroll banner view
-/// - index : Selected this index or scrolled to this index
-typealias BannerAction = (_ banner: ScrollBannerView, _ index: Int) -> ()
-
-
-
-/// Banner
-///
-class ScrollBannerView: UIView {
-    
+class ScrollBanner: UIView {
     fileprivate var timer: Timer!
     
-    var selectedAction: BannerAction?
+    var selectedAction: ( (_ banner: ScrollBanner, _ index: Int) -> () )?
     
-    var scrolledAction: BannerAction?
+    var scrolledAction: ( (_ banner: ScrollBanner, _ index: Int) -> () )?
     
     /// itemCount = items.count * contentExpendFactor
     
@@ -111,7 +61,7 @@ class ScrollBannerView: UIView {
         }
     }
     
-    var pageControl: ProgressPageControl!
+    var pageControl: BannerPageControl<LinearProgressView>!
     
     var pageControlAsidePosition: BannerIndicatorAsidePosition = .bottom(bOffset: 8.0) {
         didSet {
@@ -217,7 +167,7 @@ class ScrollBannerView: UIView {
     
     /// This function will only be called when initializing this class.
     /// So, it will initialize self.layout, self.collectionView and add self.collectionView to subviews;
-    /// No cell class will register on collection view, because itemCount == 0; 
+    /// No cell class will register on collection view, because itemCount == 0;
     ///
     private func initialization() {
         
@@ -251,19 +201,20 @@ class ScrollBannerView: UIView {
         flow.scrollDirection = .horizontal
         return flow
     }
-    private func setupPageControl() -> ProgressPageControl {
-        let control = ProgressPageControl(frame: pageControlFrame)
+    private func setupPageControl() -> BannerPageControl<LinearProgressView> {
+        let frame = pageControlFrame
+        let control = BannerPageControl<LinearProgressView>(frame: frame)
         addSubview(control)
         
-        control.selectedAction = { [weak self] (_ control: ProgressPageControl, _ atIndex: Int) -> () in
+        control.selectedAction = { [weak self] (_ control: BannerPageControl, _ atIndex: Int) -> () in
             guard let sself = self else {
                 return
             }
             
             control.disableAnimation()
-
+            
             sself.invalidTimer()
-
+            
             defer {
                 control.enableAnimation()
                 
@@ -319,7 +270,7 @@ class ScrollBannerView: UIView {
         items = newItems
     }
     
-    /// It's strange that layout.scrollDirection will be a sudden error, 
+    /// It's strange that layout.scrollDirection will be a sudden error,
     /// although this will cause nothing (cellIndex % items.count not change)
     /// - return Cell Index between 0...itemCount-1
     func cellIndex() -> Int {
@@ -383,7 +334,7 @@ class ScrollBannerView: UIView {
 }
 
 
-extension ScrollBannerView: UICollectionViewDataSource, UICollectionViewDelegate {
+extension ScrollBanner: UICollectionViewDataSource, UICollectionViewDelegate {
     
     /// UICollectionViewDataSource
     
@@ -434,7 +385,7 @@ extension ScrollBannerView: UICollectionViewDataSource, UICollectionViewDelegate
         beginDraggingIndex = cellIndex()
         
         pageControl.disableAnimation()
-
+        
         invalidTimer()
     }
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
@@ -443,7 +394,7 @@ extension ScrollBannerView: UICollectionViewDataSource, UICollectionViewDelegate
         isEndDragging = true
         
         pageControl.enableAnimation()
-
+        
         validTimer()
     }
     

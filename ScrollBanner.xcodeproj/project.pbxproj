@@ -25,6 +25,7 @@
 		18AB20EB1E135F9E008933FD /* ProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18AB20EA1E135F9E008933FD /* ProgressView.swift */; };
 		18AB331F1E14BFC100B0CD41 /* BannerLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18AB331E1E14BFC100B0CD41 /* BannerLayout.swift */; };
 		18AB33211E1504CF00B0CD41 /* UIView+Frame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18AB33201E1504CF00B0CD41 /* UIView+Frame.swift */; };
+		18AB33231E15328D00B0CD41 /* BannerPageControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18AB33221E15328D00B0CD41 /* BannerPageControl.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,6 +70,7 @@
 		18AB20EA1E135F9E008933FD /* ProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProgressView.swift; path = Class/ProgressView.swift; sourceTree = SOURCE_ROOT; };
 		18AB331E1E14BFC100B0CD41 /* BannerLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BannerLayout.swift; path = Class/BannerLayout.swift; sourceTree = SOURCE_ROOT; };
 		18AB33201E1504CF00B0CD41 /* UIView+Frame.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "UIView+Frame.swift"; path = "Class/UIView+Frame.swift"; sourceTree = SOURCE_ROOT; };
+		18AB33221E15328D00B0CD41 /* BannerPageControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BannerPageControl.swift; path = Class/BannerPageControl.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -128,6 +130,7 @@
 				18AB331E1E14BFC100B0CD41 /* BannerLayout.swift */,
 				182529D11E10BAE500E157D6 /* ScrollBannerView.swift */,
 				18AB33201E1504CF00B0CD41 /* UIView+Frame.swift */,
+				18AB33221E15328D00B0CD41 /* BannerPageControl.swift */,
 				182529A71E10B9B000E157D6 /* Main.storyboard */,
 				182529AA1E10B9B000E157D6 /* Assets.xcassets */,
 				182529AC1E10B9B000E157D6 /* LaunchScreen.storyboard */,
@@ -298,6 +301,7 @@
 			files = (
 				18092EC31E12625F005152B7 /* ProgressPageControl.swift in Sources */,
 				18AB331F1E14BFC100B0CD41 /* BannerLayout.swift in Sources */,
+				18AB33231E15328D00B0CD41 /* BannerPageControl.swift in Sources */,
 				182529D21E10BAE500E157D6 /* ScrollBannerView.swift in Sources */,
 				182529A61E10B9B000E157D6 /* ViewController.swift in Sources */,
 				182529A41E10B9B000E157D6 /* AppDelegate.swift in Sources */,

@@ -37,7 +37,7 @@ class ViewController: UIViewController {
         
         testV = ScrollBannerView(frame: CGRect(x: 0, y: 320.0, width: view.bounds.width, height: 300.0))
         testV.layout.scrollDirection = .vertical
-        view.addSubview(testV)
+//        view.addSubview(testV)
         
         testV.update(items: [
             CellConfigurator<BannerImageCell>(viewData: BannerImageCellData(image: img1)),
@@ -53,6 +53,8 @@ class ViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
+    
 
     @IBAction func changeDirectionToH(_ sender: Any) {
 //        let flow = UICollectionViewFlowLayout()

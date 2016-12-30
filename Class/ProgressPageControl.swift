@@ -18,6 +18,7 @@ typealias ProgressPageControlAction = (_ control: ProgressPageControl, _ atIndex
 ///
 class ProgressPageControl: UIControl {
     
+    /// Saving all indicators
     private var items:[ProgressView] = []
 
     /// Click action callback
@@ -61,28 +62,24 @@ class ProgressPageControl: UIControl {
             cleanupIndicator()
         }
         didSet {
-            for index in 0 ..< numberOfpages {
-                let p = createIndicator()
-                p.frame = frame(at: index)
-                items.append(p)
+            for _ in 0 ..< numberOfpages {
+                items.append( createIndicator() )
             }
+            
+            updateIndicatorFrame()
+            
             if numberOfpages == 1 {
                 isHidden = true
             }
         }
     }
     
-    /// If new currentPage == old currentPage, isSkip is true
-    fileprivate var isSkip: Bool = false
-    
     var currentPage: Int = -1 {
-        willSet {
-            isSkip = (currentPage == newValue && newValue >= 0 && newValue < items.count)
-        }
         didSet {
-            guard isSkip == false else {
+            guard currentPage != oldValue && currentPage >= 0 && currentPage < items.count else {
                 return
             }
+            items[oldValue > 0 ? oldValue : 0].cancelAnimation()
             items[currentPage].animate()
         }
     }
@@ -177,8 +174,8 @@ class ProgressPageControl: UIControl {
         guard items.isEmpty == false, currentPage >= 0, currentPage < items.count else {
             return
         }
-        items[currentPage].cancelAnimation()
         items.forEach { (p) in
+            p.cancelAnimation()
             p.isAnimatable = false
         }
     }
@@ -207,6 +204,7 @@ class ProgressPageControl: UIControl {
         }
         items.forEach { $0.removeFromSuperview() }
         items.removeAll()
+        items = []
     }
     
     

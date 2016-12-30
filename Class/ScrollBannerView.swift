@@ -59,11 +59,11 @@ typealias BannerAction = (_ banner: ScrollBannerView, _ index: Int) -> ()
 ///
 class ScrollBannerView: UIView {
     
-    private var timer: Timer!
+    fileprivate var timer: Timer!
     
     var selectedAction: BannerAction?
     
-    var scrolledACtion: BannerAction?
+    var scrolledAction: BannerAction?
     
     /// itemCount = items.count * contentExpendFactor
     
@@ -73,7 +73,27 @@ class ScrollBannerView: UIView {
     
     var items: [CellConfigurable] = [] {
         didSet {
-            scroll()
+            guard let c = collectionView, let p = pageControl, items.count > 0 else {
+                print("scroll: invalid parameter")
+                return
+            }
+            invalidTimer()
+            
+            p.numberOfpages = items.count
+            
+            if items.count == 1 {
+                c.isScrollEnabled = false
+                registerCells()
+                c.reloadData()
+            } else {
+                itemCount = items.count * contentExpendFactor
+                
+                c.isScrollEnabled = true
+                registerCells()
+                c.reloadData()
+                
+                validTimer()
+            }
         }
     }
     
@@ -81,23 +101,28 @@ class ScrollBannerView: UIView {
     
     var layout: BannerLayout! {
         didSet {
-            updateLayout()
+            guard let c = collectionView, layout is UICollectionViewLayout else {
+                return
+            }
+            invalidTimer()
+            c.collectionViewLayout = (layout as! UICollectionViewLayout)
+            c.reloadData()
+            validTimer()
         }
     }
     
     var pageControl: ProgressPageControl!
     
-    fileprivate var isSkip: Bool = false
-    
     var pageControlAsidePosition: BannerIndicatorAsidePosition = .bottom(bOffset: 8.0) {
-        willSet {
-            isSkip = pageControlAsidePosition == newValue
-        }
         didSet {
-            guard isSkip == false else {
+            guard let p = pageControl, pageControlAsidePosition != oldValue else {
                 return
             }
-            updatePageControlPosition()
+            p.disableAnimation()
+            
+            p.frame = pageControlFrame
+            
+            p.enableAnimation()
         }
     }
     
@@ -105,6 +130,22 @@ class ScrollBannerView: UIView {
     fileprivate var pageControlFrame: CGRect {
         return pageControlAsidePosition.asideFrame(baseSize: bounds.size)
     }
+    
+    /// Fixed
+    ///
+    /// Sometimes, scrollView.isDragging still be true even after endDraging method has been called.
+    /// - isEndDragging = false   : scrollViewWillBeginDragging(_:) be called
+    /// - isEndDragging = true    : scrollViewDidEndDragging(_:) be called
+    fileprivate var isEndDragging: Bool = true
+    
+    /// Fixed
+    ///
+    /// When the user just drags a little, the currentIndex() returns the same value.
+    /// This cause pageControl to ignore the setting, and the animation does not start again.
+    /// Set (beginDraggingIndex = -1) will force animation replay.
+    /// - beginDraggingIndex = currentIndex()   : scrollViewWillBeginDragging(_:) be called
+    /// - beginDraggingIndex = -1               : scrollViewDidScroll(_:) be called
+    fileprivate var beginDraggingIndex: Int = -1
     
     
     /// Life cycle
@@ -130,7 +171,7 @@ class ScrollBannerView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         layout.itemSize = frame.size
-        scroll(to: itemCount / 2, false)
+        scroll(to: itemCount / 2, isAnimated: false)
     }
     
     override func willMove(toSuperview newSuperview: UIView?) {
@@ -142,14 +183,15 @@ class ScrollBannerView: UIView {
         cleanupCollectionView()
         cleanupPageControl()
         cleanupLayout()
+        selectedAction = nil
+        scrolledAction = nil
     }
     
     
-    
     /// timer
-    ///
+    
     /// recreate a new timer instance
-    func fireTimer() {
+    func validTimer() {
         invalidTimer()
         timer = Timer.scheduledTimer(timeInterval: 3.0,
                                      target: self,
@@ -172,8 +214,7 @@ class ScrollBannerView: UIView {
         scroll(to: currentIndex() + 1)
     }
     
-    /// Collection View
-    ///
+    
     /// This function will only be called when initializing this class.
     /// So, it will initialize self.layout, self.collectionView and add self.collectionView to subviews;
     /// No cell class will register on collection view, because itemCount == 0; 
@@ -216,26 +257,21 @@ class ScrollBannerView: UIView {
         addSubview(control)
         
         control.selectedAction = { [weak self] (_ control: ProgressPageControl, _ atIndex: Int) -> () in
-            /// cancel current animation
-            control.disableAnimation()
-            
             guard let sself = self else {
                 return
             }
-            sself.invalidTimer()
             
-            let curr = sself.currentIndex()
-            let itemIndex = sself.itemIndex(with: curr)
-            var target = 0
-            if itemIndex > atIndex  {
-                target = curr - (itemIndex - atIndex)
-            } else {
-                target = curr + (atIndex - itemIndex)
+            control.disableAnimation()
+
+            sself.invalidTimer()
+
+            defer {
+                control.enableAnimation()
+                
+                sself.validTimer()
             }
             
-            sself.scroll(to: target, false)
-            
-            sself.fireTimer()
+            sself.scroll(to: sself.jumpIndex(to: atIndex), isAnimated: true)
         }
         return control
     }
@@ -275,32 +311,7 @@ class ScrollBannerView: UIView {
         }
     }
     
-    /// Update to new layout
-    ///
-    /// This function will recreate a collectionView instance with new layout type
-    ///
-    private func updateLayout() {
-        guard let c = collectionView, layout is UICollectionViewLayout else {
-            return
-        }
-        invalidTimer()
-        c.collectionViewLayout = (layout as! UICollectionViewLayout)
-        c.reloadData()
-        fireTimer()
-    }
-    
-    
-    private func updatePageControlPosition() {
-        guard let p = pageControl, isSkip == false else {
-            return
-        }
-        p.disableAnimation()
-        
-        p.frame = pageControlFrame
-        
-        p.enableAnimation()
-    }
-    
+
     
     /// Reset layout and reload data
     func update<T: UICollectionViewLayout>(bannerLayout newLayout: T) where T: BannerLayout {
@@ -313,36 +324,10 @@ class ScrollBannerView: UIView {
         items = newItems
     }
     
-    
-    /// scroll
+    /// It's strange that layout.scrollDirection will be a sudden error, 
+    /// although this will cause nothing (currentIndex % items.count not change)
     ///
-    /// Begin scroll depends on items: show its images or texts
-    ///
-    func scroll() {
-        guard let c = collectionView, let p = pageControl, items.count > 0 else {
-            print("scroll: invalid parameter")
-            return
-        }
-        invalidTimer()
-        
-        p.numberOfpages = items.count
-        
-        if items.count == 1 {
-            c.isScrollEnabled = false
-            registerCells()
-            c.reloadData()
-        } else {
-            itemCount = items.count * contentExpendFactor
-            
-            c.isScrollEnabled = true
-            registerCells()
-            c.reloadData()
-            
-            fireTimer()
-        }
-    }
-    
-    /// calculate index for cell : 0..<itemCount
+    /// - return Cell Index between 0...itemCount-1
     func currentIndex() -> Int {
         guard collectionView != nil else {
             return 0
@@ -357,13 +342,35 @@ class ScrollBannerView: UIView {
         return max(0, Int(index))
     }
     
-    /// calculate index for data : 0..<items.count
+    /// - cellIndex Cell index between 0...itemCount-1
+    /// - return Item index between 0..<items.count
     func itemIndex(with cellIndex: Int) -> Int {
+        guard cellIndex >= 0, items.isEmpty == false else {
+            return 0
+        }
         return cellIndex % items.count
     }
     
-    /// scroll collectionView to target index
-    func scroll(to targetIndex: Int, _ animated: Bool = true) {
+    /// Invoke when user selected page control indicator
+    ///
+    /// - item Target item index in items, between 0..<items.count
+    /// - return New cell index between 0...itemCount-1
+    func jumpIndex(to item: Int) -> Int {
+        let curr = currentIndex()
+        let currItemIndex = itemIndex(with: curr)
+        var target = 0
+        if currItemIndex > item  {
+            target = curr - (currItemIndex - item)
+        } else {
+            target = curr + (item - currItemIndex)
+        }
+        return target
+    }
+    
+    /// scroll collectionView to target cell index
+    ///
+    /// - targetIndex Should between 0...itemCount-1
+    func scroll(to targetIndex: Int, isAnimated animated: Bool = true) {
         guard collectionView != nil else {
             return
         }
@@ -383,13 +390,9 @@ class ScrollBannerView: UIView {
 }
 
 
-
 extension ScrollBannerView: UICollectionViewDataSource, UICollectionViewDelegate {
     
     /// UICollectionViewDataSource
-    ///
-    /// Layout cells with data source
-    ///
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return itemCount
@@ -397,9 +400,7 @@ extension ScrollBannerView: UICollectionViewDataSource, UICollectionViewDelegate
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let configurator = items[itemIndex(with: indexPath.item)]
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: configurator.reuseIdentifier, for: indexPath)
-        
         configurator.update(cell: cell)
-        
         return cell
     }
     
@@ -414,28 +415,51 @@ extension ScrollBannerView: UICollectionViewDataSource, UICollectionViewDelegate
             action(self, itemIndex(with: indexPath.item))
         }
     }
+    
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        guard items.isEmpty == false else {
+        guard items.isEmpty == false, isEndDragging else {
             return
         }
+        
+        /// See beginDraggingIndex defination
+        if beginDraggingIndex >= 0, beginDraggingIndex < itemCount, beginDraggingIndex == currentIndex() {
+            pageControl.currentPage = -1
+            beginDraggingIndex = -1
+        }
+        
         pageControl.currentPage = itemIndex(with: currentIndex() )
     }
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         guard itemCount > 1 && scrollView.isScrollEnabled else {
             return
         }
-        invalidTimer()
+        
+        /// See isEndDragging defination
+        isEndDragging = false
+        
+        /// See beginDraggingIndex defination
+        beginDraggingIndex = currentIndex()
+        
         pageControl.disableAnimation()
+
+        invalidTimer()
     }
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        fireTimer()
+        
+        /// See isEndDragging defination
+        isEndDragging = true
+        
         pageControl.enableAnimation()
+
+        validTimer()
     }
+    
+    
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         scrollViewDidEndScrollingAnimation(scrollView)
     }
     func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
-        guard items.isEmpty == false, let action = scrolledACtion else {
+        guard items.isEmpty == false, let action = scrolledAction else {
             return
         }
         action(self, itemIndex(with: currentIndex()))

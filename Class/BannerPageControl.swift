@@ -10,68 +10,13 @@ import Foundation
 import UIKit
 
 
-protocol Selectable {
-    var selectedAction: (_ on: Selectable, _ atIndex: Int) -> () {get set}
-}
-
-protocol Progressive {
-    
-    func resume()
-    
-    func suspend()
-    
-    func cancel()
-}
-
-extension CAAnimation {
-    
-    struct AnimateKey {
-        
-    }
-
-}
-
-
-protocol Animateable: class {
-    var isAnimatable: Bool {get set}
-    
-    func disable()
-    
-    func enable()
-}
-
-
-protocol Colorable: class {
-    var normalTintColor: UIColor? {get set}
-    
-    var highlightTintColor: UIColor? {get set}
-}
-
-protocol PageControlType {
-    var numberOfPages: Int {get set}
-    
-    var currentPage: Int {get set}
-    
-    var hidesForSinglePage: Bool {get set}
-    
-    var pageIndicatorTintColor: UIColor? {get set}
-    
-    var currentPageIndicatorTintColor: UIColor? {get set}
-    
-    func size(forNumberOfPages pageCount: Int) -> CGSize
-}
-
-
-
-
-
-class BannerPageControl <T: UIView> : UIControl, PageControlType where T: Colorable {
+final class BannerPageControl <T: UIView> : UIControl, BannerPageControlItem  where T: BannerPageItem {
     
     /// Saving all indicators
     fileprivate var items:[T] = []
     
     /// Click action callback
-    var selectedAction: ( (_ control: BannerPageControl, _ atIndex: Int) -> () )?
+    var selectedAction: ( (BannerPageControl<T>, Int) -> () )?
     
     
     var lineSpace: CGFloat = 8.0 {
@@ -127,10 +72,8 @@ class BannerPageControl <T: UIView> : UIControl, PageControlType where T: Colora
             guard currentPage != oldValue && currentPage >= 0 && currentPage < items.count else {
                 return
             }
-            if items[oldValue > 0 ? oldValue : 0] is Animateable {
-                (items[oldValue > 0 ? oldValue : 0] as! Animateable).disable()
-                (items[currentPage] as! Animateable).enable()
-            }
+            items[oldValue > 0 ? oldValue : 0].resignFocus()
+            items[currentPage].becomeFocus()
         }
     }
     
@@ -205,6 +148,24 @@ class BannerPageControl <T: UIView> : UIControl, PageControlType where T: Colora
         return CGFloat(numberOfPages) * ( result + lineSpace) - lineSpace
     }
     
+    func startResponseDragging() {
+        guard items.isEmpty == false, currentPage >= 0, currentPage < items.count else {
+            return
+        }
+        items.forEach {
+            $0.resignFocus()
+            $0.isFocusable = false
+        }
+    }
+    
+    func endResponseDragging() {
+        guard items.isEmpty == false, currentPage >= 0, currentPage < items.count else {
+            return
+        }
+        items.forEach {
+            $0.isFocusable = true
+        }
+    }
     
     override var frame: CGRect {
         didSet {
@@ -255,34 +216,18 @@ class BannerPageControl <T: UIView> : UIControl, PageControlType where T: Colora
         super.touchesEnded(touches, with: event)
     }
     
-    func disableAnimation() {
-        guard items.isEmpty == false, currentPage >= 0, currentPage < items.count else {
-            return
-        }
-        items.forEach { (p) in
-            if p is Animateable {
-                (p as! Animateable).disable()
-                (p as! Animateable).isAnimatable = false
-            }
-            
-        }
-    }
-    
-    func enableAnimation() {
-        guard items.isEmpty == false, currentPage >= 0, currentPage < items.count else {
-            return
-        }
-        items.forEach { (p) in
-            if p is Animateable {
-                (p as! Animateable).isAnimatable = true
-            }
-            
-        }
-    }
-    
     /// create a UIProgressView instance and add it to super view (self)
     fileprivate func createIndicator() -> T {
-        let p = T(frame: CGRect(origin: CGPoint.zero, size: indicatorSize))
+        let centerFrame = CGRect(x: (bounds.width - indicatorSize.width) * 0.5,
+                                 y: (bounds.height - indicatorSize.height) * 0.5,
+                                 width: indicatorSize.width,
+                                 height: indicatorSize.height)
+        let p = T(frame: centerFrame)
+        p.layer.shadowColor = UIColor.black.cgColor
+        p.layer.shadowOffset = CGSize(width: 0, height: 6)
+        p.layer.shadowRadius = 10
+        p.layer.shadowOpacity = 0.8
+        p.layer.cornerRadius = indicatorLength * 0.5
         p.normalTintColor = UIColor(white: 0.9, alpha: 0.9)
         p.highlightTintColor = UIColor.gray
         addSubview(p)
@@ -305,8 +250,15 @@ class BannerPageControl <T: UIView> : UIControl, PageControlType where T: Colora
         guard items.isEmpty == false else {
             return
         }
+        let centerFrame = CGRect(x: (bounds.width - indicatorSize.width) * 0.5,
+                                 y: (bounds.height - indicatorSize.height) * 0.5,
+                                 width: indicatorSize.width,
+                                 height: indicatorSize.height)
+        items.forEach { $0.frame = centerFrame }
         for i in 0 ..< items.count {
-            items[i].frame = frame(at: i)
+            UIView.animate(withDuration: 0.5, animations: {
+                self.items[i].frame = self.frame(at: i)
+            })
         }
     }
     

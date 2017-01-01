@@ -10,9 +10,10 @@ import UIKit
 
 class ViewController: UIViewController {
 
-    var test: ScrollBannerView!
-    var testV: ScrollBanner!
-    var p: UIProgressView!
+//    var test: ScrollBannerView!
+//    var testV: ScrollBanner!
+    
+    var banner: BannerView<BannerPageControl<LinearProgressView > >!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,28 +26,42 @@ class ViewController: UIViewController {
         let img2 = UIImage(contentsOfFile: path2)!
         let img3 = UIImage(contentsOfFile: path3)!
         
-        test = ScrollBannerView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 300.0))
-//        view.addSubview(test)
+        let button1 = UIButton(frame: CGRect(x: 0, y: 320, width: view.bounds.width, height: 34))
+        button1.setTitle("destroy", for: .normal)
+        button1.setTitleColor(UIColor.black, for: .normal)
+        button1.addTarget(self, action: #selector(ViewController.destroyBanner), for: .touchUpInside)
+        view.addSubview(button1)
         
-        test.update(items: [
+        let button2 = UIButton(frame: CGRect(x: 0, y: 360, width: view.bounds.width, height: 34))
+        button2.setTitle("changeDirection", for: .normal)
+        button2.setTitleColor(UIColor.black, for: .normal)
+        button2.addTarget(self, action: #selector(ViewController.changeDirection), for: .touchUpInside)
+        view.addSubview(button2)
+        
+        let button3 = UIButton(frame: CGRect(x: 0, y: 400, width: view.bounds.width, height: 34))
+        button3.setTitle("changeIndicatorPosition", for: .normal)
+        button3.setTitleColor(UIColor.black, for: .normal)
+        button3.addTarget(self, action: #selector(ViewController.changeIndicatorPosition), for: .touchUpInside)
+        view.addSubview(button3)
+        
+        banner = BannerView< BannerPageControl< LinearProgressView > >(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 300))
+        
+//        banner.scrollDirection = .vertical
+
+//        view.addSubview(banner)
+        
+//        banner.scrollDirection = .vertical
+        
+        banner.scroll(items: [
             CellConfigurator<BannerImageCell>(viewData: BannerImageCellData(image: img1)),
             CellConfigurator<BannerImageCell>(viewData: BannerImageCellData(image: img2)),
             CellConfigurator<BannerImageCell>(viewData: BannerImageCellData(image: img3))
             ])
         
-        
-        testV = ScrollBanner(frame: CGRect(x: 0, y: 320.0, width: view.bounds.width, height: 300.0))
-//        testV.layout.scrollDirection = .vertical
-        view.addSubview(testV)
-        
-        testV.update(items: [
-            CellConfigurator<BannerImageCell>(viewData: BannerImageCellData(image: img1)),
-            CellConfigurator<BannerImageCell>(viewData: BannerImageCellData(image: img2)),
-            CellConfigurator<BannerImageCell>(viewData: BannerImageCellData(image: img3))
-            ])
-        
-        
-        
+//        banner.scrollDirection = .vertical
+
+        view.addSubview(banner)
+
     }
     
     override func didReceiveMemoryWarning() {
@@ -54,32 +69,35 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    
-
-    @IBAction func changeDirectionToH(_ sender: Any) {
-//        let flow = UICollectionViewFlowLayout()
-//        flow.itemSize = CGSize(width: view.bounds.width, height: 300.0)
-//        flow.minimumLineSpacing = 0.0
-//        flow.scrollDirection = .horizontal
-//        testV.update(bannerLayout: flow)
-        
-//        testV.pageControl.frame = CGRect(x: 0, y: 0, width: 24, height: 300)
-        
-//        testV.pageControlAsidePosition = .top(tOffset: 8.0)
-//        testV.pageControlAsidePosition = .right(rOffset: 8.0)
-        testV.pageControlAsidePosition = .left(lOffset: 8.0)
-        
+    func changeIndicatorPosition() {
+        guard let b = banner else {
+            return
+        }
+        switch b.pageControlAsidePosition {
+        case .bottom(offset: 8.0): b.pageControlAsidePosition = .top(offset: 8.0)
+        case .top(offset: 8.0): b.pageControlAsidePosition = .left(offset: 8.0)
+        case .left(offset: 8.0): b.pageControlAsidePosition = .right(offset: 8.0)
+        case .right(offset: 8.0): b.pageControlAsidePosition = .bottom(offset: 8.0)
+        default: break
+        }
     }
-    @IBAction func destroyBanner(_ sender: Any) {
-        // do not click twice, just simple test
-        
-        print("removed")
-        test.removeFromSuperview()
-        print("set nil")
-        test = nil
-        
-        testV.removeFromSuperview()
-        testV = nil
+
+    func changeDirection() {
+        guard let b = banner else {
+            return
+        }
+        if b.scrollDirection == .horizontal {
+            b.scrollDirection = .vertical
+        } else {
+            b.scrollDirection = .horizontal
+        }
+    }
+    func destroyBanner() {
+        guard let b = banner else {
+            return
+        }
+        b.removeFromSuperview()
+        banner = nil
     }
 
 }

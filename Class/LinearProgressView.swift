@@ -8,54 +8,24 @@
 
 import UIKit
 
+extension CAAnimation {
+    
+    public struct AnimateKey {
+        
+    }
+    
+}
 
 extension CAAnimation.AnimateKey {
     static let strokeEnd = "LinearProgressView_end_animate_key"
 }
 
-extension LinearProgressView: Animateable {
-    
-}
-
-extension LinearProgressView: Colorable {
-    
-}
 
 class LinearProgressView: UIView, CAAnimationDelegate {
     
     var bar: CAShapeLayer
     var endanimate: CABasicAnimation
-    
-    var normalTintColor: UIColor? {
-        didSet {
-            backgroundColor = normalTintColor
-        }
-    }
-    
-    var highlightTintColor: UIColor? {
-        didSet {
-            bar.strokeColor = highlightTintColor?.cgColor
-        }
-    }
-    
-    /// Animatable protocal
-    
     var isAnimatable: Bool = true
-    
-    func enable() {
-        if let _ = bar.animation(forKey: CAAnimation.AnimateKey.strokeEnd) {
-            bar.removeAnimation(forKey: CAAnimation.AnimateKey.strokeEnd)
-        }
-        if isAnimatable {
-            bar.add(endanimate, forKey: CAAnimation.AnimateKey.strokeEnd)
-        }
-    }
-    
-    func disable() {
-        if let _ = bar.animation(forKey: CAAnimation.AnimateKey.strokeEnd) {
-            bar.removeAnimation(forKey: CAAnimation.AnimateKey.strokeEnd)
-        }
-    }
     
     /// CAAnimationDelegate
     
@@ -76,11 +46,11 @@ class LinearProgressView: UIView, CAAnimationDelegate {
         path.move(to: CGPoint.zero)
         path.addLine(to: CGPoint(x: frame.width, y: 0.0))
         
-        let layer = CAShapeLayer()
-        layer.path = path.cgPath
-        layer.lineWidth = frame.height
-        layer.fillColor = UIColor.clear.cgColor
-        layer.strokeEnd = 0.001
+        let shape = CAShapeLayer()
+        shape.path = path.cgPath
+        shape.lineWidth = frame.height
+        shape.fillColor = UIColor.clear.cgColor
+        shape.strokeEnd = 0.001
         
         let end = CABasicAnimation(keyPath: "strokeEnd")
         end.fromValue = 0.001
@@ -89,7 +59,7 @@ class LinearProgressView: UIView, CAAnimationDelegate {
         end.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionLinear)
         end.isRemovedOnCompletion = true
         
-        bar = layer
+        bar = shape
         endanimate = end
         super.init(frame: frame)
         endanimate.delegate = self
@@ -129,7 +99,70 @@ class LinearProgressView: UIView, CAAnimationDelegate {
         }
     }
     
+    fileprivate func enableAnimation() {
+        if let _ = bar.animation(forKey: CAAnimation.AnimateKey.strokeEnd) {
+            bar.removeAnimation(forKey: CAAnimation.AnimateKey.strokeEnd)
+        }
+        if isAnimatable {
+            bar.add(endanimate, forKey: CAAnimation.AnimateKey.strokeEnd)
+        }
+    }
     
+    fileprivate func disableAnimation() {
+        if let _ = bar.animation(forKey: CAAnimation.AnimateKey.strokeEnd) {
+            bar.removeAnimation(forKey: CAAnimation.AnimateKey.strokeEnd)
+        }
+    }
     
 
 }
+
+/// BannerPageItem
+
+extension LinearProgressView: BannerPageItem {
+    
+    var isFocusable: Bool {
+        get {
+            return isAnimatable
+        }
+        set {
+            if isAnimatable != newValue {
+                isAnimatable = newValue
+            }
+        }
+    }
+    
+    var normalTintColor: UIColor? {
+        get {
+            return backgroundColor
+        }
+        set {
+            if newValue != backgroundColor {
+                backgroundColor = newValue
+            }
+        }
+    }
+    
+    var highlightTintColor: UIColor? {
+        get {
+            return bar.strokeColor == nil ? nil : UIColor(cgColor: bar.strokeColor!)
+        }
+        set {
+            if newValue?.cgColor != bar.strokeColor {
+                bar.strokeColor = newValue?.cgColor
+            }
+        }
+    }
+    
+    func becomeFocus() {
+        enableAnimation()
+    }
+    
+    func resignFocus() {
+        disableAnimation()
+    }
+    
+    
+    
+}
+

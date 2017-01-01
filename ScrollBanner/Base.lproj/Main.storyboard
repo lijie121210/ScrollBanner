@@ -20,29 +20,7 @@
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="efd-qw-OIt">
-                                <rect key="frame" x="161" y="597" width="52" height="30"/>
-                                <state key="normal" title="destroy"/>
-                                <connections>
-                                    <action selector="destroyBanner:" destination="BYZ-38-t0r" eventType="touchUpInside" id="dkZ-M1-eqG"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZUP-k0-FcK">
-                                <rect key="frame" x="167" y="553" width="41" height="30"/>
-                                <state key="normal" title="v -&gt; h"/>
-                                <connections>
-                                    <action selector="changeDirectionToH:" destination="BYZ-38-t0r" eventType="touchUpInside" id="zXO-VX-tVz"/>
-                                </connections>
-                            </button>
-                        </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        <constraints>
-                            <constraint firstItem="ZUP-k0-FcK" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Njo-EN-v8T"/>
-                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="efd-qw-OIt" secondAttribute="bottom" constant="40" id="NuG-4l-8qm"/>
-                            <constraint firstItem="efd-qw-OIt" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="aXc-Mn-qKe"/>
-                            <constraint firstItem="efd-qw-OIt" firstAttribute="top" secondItem="ZUP-k0-FcK" secondAttribute="bottom" constant="14" id="lEB-eI-yTE"/>
-                        </constraints>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

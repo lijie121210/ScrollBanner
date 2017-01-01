@@ -16,7 +16,7 @@ typealias BannerScrollDirection = UICollectionViewScrollDirection
 ///
 /// Basic requirement for layout using in Banner View
 ///
-protocol BannerLayout {
+protocol BannerLayout: class {
     var itemSize: CGSize {get set}
     var scrollDirection: BannerScrollDirection {get set}
     var minimumLineSpacing: CGFloat {get set}

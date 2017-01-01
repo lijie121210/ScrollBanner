@@ -10,17 +10,15 @@ import UIKit
 
 class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollectionViewDelegate where T: BannerControlItem {
     
-    fileprivate var timer: Timer!
+    private var timer: Timer!
     
-    fileprivate var pageControl: T!
-
-    fileprivate var collectionView: UICollectionView!
+    var pageControl: T!
+    var collectionView: UICollectionView!
 
 
     /// Touch event callback
     
     var selectedAction: ( (_ banner: BannerView<T>, _ index: Int) -> () )?
-    
     var scrolledAction: ( (_ banner: BannerView<T>, _ index: Int) -> () )?
     
     
@@ -150,7 +148,6 @@ class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollecti
         if let c = collectionView {
             c.frame = bounds
         }
-//        scroll(to: itemCount / 2, isAnimated: false)
     }
     override func willMove(toSuperview newSuperview: UIView?) {
         /// removed from superview
@@ -244,20 +241,26 @@ class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollecti
     
     private func setupPageControl() -> T {
         let control = T(frame: pageControlFrame)
-        control.selectedAction = { [weak self] (control, atIndex) -> () in
-            guard let sself = self else {
-                return
-            }
-            control.startResponseDragging()
-            sself.invalidTimer()
-            sself.scroll(to: sself.jumpIndex(to: atIndex), isAnimated: true)
-            control.endResponseDragging()
-            sself.validTimer()
-        }
-        
+        control.addTarget(self, action: #selector(BannerView.didReceiveEvent(_:)), for: UIControlEvents.valueChanged)
         addSubview(control)
-        
         return control
+    }
+    
+    func didReceiveEvent(_ sender: Any?) {
+        guard let sender = sender as? T else {
+            return
+        }
+        invalidTimer()
+        sender.startResponseDragging()
+        let jumpResult = jumpIndex(to: sender.selectedIndex)
+        sender.endResponseDragging()
+        if jumpResult.isJumpped {
+            scroll(to: jumpResult.index, isAnimated: true)
+        } else {
+            sender.currentPage = -1
+            sender.currentPage = itemIndex(with: jumpResult.index)
+        }
+        validTimer()
     }
     
     /// Clean up refercence
@@ -272,7 +275,7 @@ class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollecti
     }
     private func cleanupPageControl() {
         if let p = pageControl {
-            p.selectedAction = nil
+            p.removeTarget(self, action: nil, for: .valueChanged)
             p.removeFromSuperview()
         }
         pageControl = nil
@@ -307,16 +310,19 @@ class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollecti
     /// Invoke when user selected page control indicator
     /// - item Target item index in items, between 0..<items.count
     /// - return New cell index between 0...itemCount-1
-    fileprivate func jumpIndex(to item: Int) -> Int {
+    fileprivate func jumpIndex(to item: Int) -> (isJumpped: Bool, index: Int) {
         let curr = cellIndex()
         let currItemIndex = itemIndex(with: curr)
-        var target = 0
+        var target = curr
+        var isJumpped = true
         if currItemIndex > item  {
             target = curr - (currItemIndex - item)
-        } else {
+        } else if currItemIndex < item {
             target = curr + (item - currItemIndex)
+        } else {
+            isJumpped = false
         }
-        return target
+        return (isJumpped, target)
     }
     
     /// scroll collectionView to target cell index

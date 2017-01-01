@@ -10,24 +10,37 @@ import Foundation
 import UIKit
 
 
-final class BannerPageControl <T: UIView> : UIControl, BannerControlItem  where T: BannerPageItem {
+class LinearPageControl <T: UIView> : UIControl, BannerControlItem  where T: BannerPageItem {
     
     /// Saving all indicators
     fileprivate var items:[T] = []
     
-    /// Click action callback
-    var selectedAction: ( (BannerPageControl<T>, Int) -> () )?
+    var selectedIndex: Int = -1
     
-    
-    var lineSpace: CGFloat = 8.0 {
+    var numberOfPages: Int = 0 {
+        willSet {
+            cleanupIndicator()
+        }
         didSet {
-            if oldValue != lineSpace {
-                updateIndicatorFrame()
+            for _ in 0 ..< numberOfPages {
+                items.append( createIndicator() )
             }
+            updateIndicatorFrame()
+            
+            checkHidesForSinglePage()
         }
     }
     
-    /// Update apperence
+    /// Setting -1 to currentPage to remove old value
+    var currentPage: Int = -1 {
+        didSet {
+            guard currentPage != oldValue, currentPage >= 0 && currentPage < items.count, oldValue < items.count else {
+                return
+            }
+            items[oldValue > 0 ? oldValue : 0].resignFocus()
+            items[currentPage].becomeFocus()
+        }
+    }
     
     var hidesForSinglePage: Bool = false {
         didSet {
@@ -53,60 +66,14 @@ final class BannerPageControl <T: UIView> : UIControl, BannerControlItem  where 
         }
     }
     
-    var numberOfPages: Int = 0 {
-        willSet {
-            cleanupIndicator()
-        }
-        didSet {
-            for _ in 0 ..< numberOfPages {
-                items.append( createIndicator() )
-            }
-            updateIndicatorFrame()
-            
-            checkHidesForSinglePage()
-        }
-    }
-    
-    var currentPage: Int = -1 {
-        didSet {
-            guard currentPage != oldValue && currentPage >= 0 && currentPage < items.count else {
-                return
-            }
-            items[oldValue > 0 ? oldValue : 0].resignFocus()
-            items[currentPage].becomeFocus()
-        }
-    }
-    
-    fileprivate var layoutDirection: BannerScrollDirection {
+    var layoutDirection: BannerScrollDirection {
         return isHorizontal ? .horizontal : .vertical
     }
-    
-    /// Height for each indicator
-    var indicatorLength: CGFloat = 2.0 {
-        didSet {
-            if oldValue != indicatorLength {
-                updateIndicatorFrame()
-            }
-        }
-    }
-    
-    /// Limit width for each indicator
-    var indicatorContentWidthLimit: CGFloat = 60.0 {
-        didSet {
-            if oldValue != indicatorContentWidthLimit {
-                updateIndicatorFrame()
-            }
-        }
-    }
-    
-    /// Limit height for each indicator
-    var indicatorContentHeightLimit: CGFloat = 60.0 {
-        didSet {
-            if oldValue != indicatorContentHeightLimit {
-                updateIndicatorFrame()
-            }
-        }
-    }
+
+    let lineSpace: CGFloat = 8.0
+    let indicatorLength: CGFloat = 2.0
+    let indicatorContentWidthLimit: CGFloat = 60.0
+    let indicatorContentHeightLimit: CGFloat = 60.0
     
     /// Size for each indicator
     ///
@@ -139,13 +106,19 @@ final class BannerPageControl <T: UIView> : UIControl, BannerControlItem  where 
         var result: CGFloat = 0.0
         
         switch layoutDirection {
-        case .horizontal:
-            result = indicatorSize.width
-        case .vertical:
-            result = indicatorSize.height
+        case .horizontal: result = indicatorSize.width
+        case .vertical: result = indicatorSize.height
         }
         
         return CGFloat(numberOfPages) * ( result + lineSpace) - lineSpace
+    }
+    
+    /// - return Longest length
+    func size(forNumberOfPages pageCount: Int) -> CGSize {
+        switch layoutDirection {
+        case .horizontal: return CGSize(width: indicatorContentLength, height: indicatorLength)
+        case .vertical: return CGSize(width: indicatorLength, height: indicatorContentLength)
+        }
     }
     
     func startResponseDragging() {
@@ -177,7 +150,7 @@ final class BannerPageControl <T: UIView> : UIControl, BannerControlItem  where 
     
     
     deinit {
-        print("BannerPageControl<\(T.self)>.deinit")
+        print("LinearPageControl<\(T.self)>.deinit")
     }
     
     override func willMove(toSuperview newSuperview: UIView?) {
@@ -186,16 +159,9 @@ final class BannerPageControl <T: UIView> : UIControl, BannerControlItem  where 
         }
     }
     
-    /// - return Longest length
-    func size(forNumberOfPages pageCount: Int) -> CGSize {
-        switch layoutDirection {
-        case .horizontal: return CGSize(width: indicatorContentLength, height: indicatorLength)
-        case .vertical: return CGSize(width: indicatorLength, height: indicatorContentLength)
-        }
-    }
     
     /// check should hides
-    fileprivate func checkHidesForSinglePage() {
+    func checkHidesForSinglePage() {
         if numberOfPages == 1 && hidesForSinglePage {
             isHidden = true
         } else {
@@ -208,10 +174,11 @@ final class BannerPageControl <T: UIView> : UIControl, BannerControlItem  where 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         if let touch = touches.first,
             let posv = touch.view as? T,
-            let index = items.index(of: posv),
-            let action = selectedAction {
+            let index = items.index(of: posv) {
             
-            action(self, index)
+            selectedIndex = index
+            
+            sendActions(for: .valueChanged)
         }
         super.touchesEnded(touches, with: event)
     }
@@ -224,9 +191,9 @@ final class BannerPageControl <T: UIView> : UIControl, BannerControlItem  where 
                                  height: indicatorSize.height)
         let p = T(frame: centerFrame)
         p.layer.shadowColor = UIColor.black.cgColor
-        p.layer.shadowOffset = CGSize(width: 0, height: 6)
-        p.layer.shadowRadius = 10
-        p.layer.shadowOpacity = 0.8
+        p.layer.shadowOffset = CGSize(width: 0, height: 4)
+        p.layer.shadowRadius = 6
+        p.layer.shadowOpacity = 0.2
         p.layer.cornerRadius = indicatorLength * 0.5
         p.normalTintColor = UIColor(white: 0.9, alpha: 0.9)
         p.highlightTintColor = UIColor.gray

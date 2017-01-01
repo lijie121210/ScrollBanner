@@ -10,21 +10,33 @@ import UIKit
 
 class ViewController: UIViewController {
 
-//    var test: ScrollBannerView!
-//    var testV: ScrollBanner!
-    
-    var banner: BannerView<BannerPageControl<LinearProgressView > >!
+    var banner: BannerView<LinearPageControl<LinearProgressView > >!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let path1 = Bundle.main.path(forResource: "img1", ofType: "jpg")!
-        let path2 = Bundle.main.path(forResource: "img2", ofType: "jpg")!
-        let path3 = Bundle.main.path(forResource: "img3", ofType: "jpg")!
+        banner = BannerView< LinearPageControl< LinearProgressView > >(frame: CGRect(x: 0, y: 20, width: view.bounds.width, height: 280))
+        banner.backgroundColor = UIColor.lightGray
+        view.addSubview(banner)
         
-        let img1 = UIImage(contentsOfFile: path1)!
-        let img2 = UIImage(contentsOfFile: path2)!
-        let img3 = UIImage(contentsOfFile: path3)!
+        let items = [CellConfigurator<BannerTextCell>(viewData: BannerTextCellData(text: "Linear progress banner indicator")),
+                     CellConfigurator<BannerTextCell>(viewData: BannerTextCellData(text: "Circle progress banner indicator")),
+                     CellConfigurator<BannerTextCell>(viewData: BannerTextCellData(text: "Dots banner indicator"))]
+        
+        banner.selectedAction = { [weak self] (banner, index) -> () in
+            var controller: UIViewController? = nil
+            switch index {
+            case 0: controller = LinearViewController()
+            case 1: controller = CircleViewController()
+            default: break
+            }
+            guard let c = controller else {
+                return
+            }
+            self?.present(c, animated: true, completion: nil)
+        }
+        
+        banner.scroll(items: items)
         
         let button1 = UIButton(frame: CGRect(x: 0, y: 320, width: view.bounds.width, height: 34))
         button1.setTitle("destroy", for: .normal)
@@ -44,31 +56,24 @@ class ViewController: UIViewController {
         button3.addTarget(self, action: #selector(ViewController.changeIndicatorPosition), for: .touchUpInside)
         view.addSubview(button3)
         
-        banner = BannerView< BannerPageControl< LinearProgressView > >(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 300))
-        view.addSubview(banner)
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         
-        banner.selectedAction = { (banner, index) -> () in
-            print("banner.selectedAction : ", index)
-        }
-        banner.scrolledAction = { (banner, index) -> () in
-            print("banner.scrolledAction : ", index)
-        }
         
-        banner.scroll(items: [
-            CellConfigurator<BannerImageCell>(viewData: BannerImageCellData(image: img1)),
-            CellConfigurator<BannerImageCell>(viewData: BannerImageCellData(image: img2)),
-            CellConfigurator<BannerImageCell>(viewData: BannerImageCellData(image: img3))
-            ])
-        
-       
-        
+    }
 
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
     
     func changeIndicatorPosition() {
         guard let b = banner else {

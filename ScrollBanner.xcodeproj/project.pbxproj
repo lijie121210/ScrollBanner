@@ -21,12 +21,15 @@
 		182F095C1E1740EA00A43C72 /* BannerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182F09501E1740EA00A43C72 /* BannerCell.swift */; };
 		182F095D1E1740EA00A43C72 /* BannerImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182F09511E1740EA00A43C72 /* BannerImageCell.swift */; };
 		182F095E1E1740EA00A43C72 /* BannerLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182F09521E1740EA00A43C72 /* BannerLayout.swift */; };
-		182F095F1E1740EA00A43C72 /* BannerPageControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182F09531E1740EA00A43C72 /* BannerPageControl.swift */; };
+		182F095F1E1740EA00A43C72 /* LinearPageControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182F09531E1740EA00A43C72 /* LinearPageControl.swift */; };
 		182F09601E1740EA00A43C72 /* BannerControlItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182F09541E1740EA00A43C72 /* BannerControlItem.swift */; };
 		182F09631E1740EA00A43C72 /* LinearProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182F09571E1740EA00A43C72 /* LinearProgressView.swift */; };
 		182F09671E1740EA00A43C72 /* UIView+Frame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182F095B1E1740EA00A43C72 /* UIView+Frame.swift */; };
 		182F09691E174DE500A43C72 /* CircleProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182F09681E174DE500A43C72 /* CircleProgressView.swift */; };
 		182F096B1E1757C000A43C72 /* BannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182F096A1E1757C000A43C72 /* BannerView.swift */; };
+		182F096F1E19416F00A43C72 /* CircleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182F096E1E19416F00A43C72 /* CircleViewController.swift */; };
+		182F09711E1941A600A43C72 /* LinearViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182F09701E1941A600A43C72 /* LinearViewController.swift */; };
+		182F09731E19422400A43C72 /* BannerTextCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182F09721E19422400A43C72 /* BannerTextCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,12 +70,15 @@
 		182F09501E1740EA00A43C72 /* BannerCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BannerCell.swift; sourceTree = "<group>"; };
 		182F09511E1740EA00A43C72 /* BannerImageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BannerImageCell.swift; sourceTree = "<group>"; };
 		182F09521E1740EA00A43C72 /* BannerLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BannerLayout.swift; sourceTree = "<group>"; };
-		182F09531E1740EA00A43C72 /* BannerPageControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BannerPageControl.swift; sourceTree = "<group>"; };
+		182F09531E1740EA00A43C72 /* LinearPageControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinearPageControl.swift; sourceTree = "<group>"; };
 		182F09541E1740EA00A43C72 /* BannerControlItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BannerControlItem.swift; sourceTree = "<group>"; };
 		182F09571E1740EA00A43C72 /* LinearProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinearProgressView.swift; sourceTree = "<group>"; };
 		182F095B1E1740EA00A43C72 /* UIView+Frame.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Frame.swift"; sourceTree = "<group>"; };
 		182F09681E174DE500A43C72 /* CircleProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CircleProgressView.swift; sourceTree = "<group>"; };
 		182F096A1E1757C000A43C72 /* BannerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BannerView.swift; sourceTree = "<group>"; };
+		182F096E1E19416F00A43C72 /* CircleViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CircleViewController.swift; sourceTree = "<group>"; };
+		182F09701E1941A600A43C72 /* LinearViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinearViewController.swift; sourceTree = "<group>"; };
+		182F09721E19422400A43C72 /* BannerTextCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BannerTextCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,6 +132,8 @@
 			children = (
 				182529A31E10B9B000E157D6 /* AppDelegate.swift */,
 				182529A51E10B9B000E157D6 /* ViewController.swift */,
+				182F096E1E19416F00A43C72 /* CircleViewController.swift */,
+				182F09701E1941A600A43C72 /* LinearViewController.swift */,
 				182529A71E10B9B000E157D6 /* Main.storyboard */,
 				182529AA1E10B9B000E157D6 /* Assets.xcassets */,
 				182529AC1E10B9B000E157D6 /* LaunchScreen.storyboard */,
@@ -161,10 +169,11 @@
 			children = (
 				182F09501E1740EA00A43C72 /* BannerCell.swift */,
 				182F09511E1740EA00A43C72 /* BannerImageCell.swift */,
+				182F09721E19422400A43C72 /* BannerTextCell.swift */,
 				182F09521E1740EA00A43C72 /* BannerLayout.swift */,
 				182F09541E1740EA00A43C72 /* BannerControlItem.swift */,
 				182F096A1E1757C000A43C72 /* BannerView.swift */,
-				182F09531E1740EA00A43C72 /* BannerPageControl.swift */,
+				182F09531E1740EA00A43C72 /* LinearPageControl.swift */,
 				182F09571E1740EA00A43C72 /* LinearProgressView.swift */,
 				182F09681E174DE500A43C72 /* CircleProgressView.swift */,
 				182F095B1E1740EA00A43C72 /* UIView+Frame.swift */,
@@ -312,13 +321,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				182F09631E1740EA00A43C72 /* LinearProgressView.swift in Sources */,
+				182F09711E1941A600A43C72 /* LinearViewController.swift in Sources */,
 				182F095E1E1740EA00A43C72 /* BannerLayout.swift in Sources */,
 				182F09691E174DE500A43C72 /* CircleProgressView.swift in Sources */,
 				182F09671E1740EA00A43C72 /* UIView+Frame.swift in Sources */,
 				182529A61E10B9B000E157D6 /* ViewController.swift in Sources */,
 				182F09601E1740EA00A43C72 /* BannerControlItem.swift in Sources */,
-				182F095F1E1740EA00A43C72 /* BannerPageControl.swift in Sources */,
+				182F095F1E1740EA00A43C72 /* LinearPageControl.swift in Sources */,
+				182F09731E19422400A43C72 /* BannerTextCell.swift in Sources */,
 				182F096B1E1757C000A43C72 /* BannerView.swift in Sources */,
+				182F096F1E19416F00A43C72 /* CircleViewController.swift in Sources */,
 				182F095D1E1740EA00A43C72 /* BannerImageCell.swift in Sources */,
 				182529A41E10B9B000E157D6 /* AppDelegate.swift in Sources */,
 				182F095C1E1740EA00A43C72 /* BannerCell.swift in Sources */,

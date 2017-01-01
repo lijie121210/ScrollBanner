@@ -54,11 +54,11 @@ extension BannerIndicatorAsidePosition {
 
 /// Something like UIPageControl should perform those protocals
 
-protocol Selectable: class {
-    var selectedAction: ((_ on: Self, _ atIndex: Int) -> ())? {get set}
-}
 
-protocol BannerControlItem : class, Selectable {
+protocol BannerControlItem : class {
+        
+    var selectedIndex: Int {get set}
+    
     var numberOfPages: Int {get set}
     
     var currentPage: Int {get set}

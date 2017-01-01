@@ -9,16 +9,13 @@
 import UIKit
 
 
-//public extension CAAnimation.Keys {
-//
-//}
 public extension BannerAnimation.Keys {
     public static let linearProgressStrokeEnd = "LinearProgressView_end_animate_key"
 }
 
 class LinearProgressView: UIView, CAAnimationDelegate {
     
-    var bar: CAShapeLayer
+    var strip: CAShapeLayer
     var endanimate: CABasicAnimation
     var isAnimatable: Bool = true
     
@@ -26,7 +23,7 @@ class LinearProgressView: UIView, CAAnimationDelegate {
     
     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
         if anim is CABasicAnimation {
-            bar.strokeEnd = 0.001
+            strip.strokeEnd = 0.001
         }
     }
     
@@ -54,11 +51,11 @@ class LinearProgressView: UIView, CAAnimationDelegate {
         end.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionLinear)
         end.isRemovedOnCompletion = true
         
-        bar = shape
+        strip = shape
         endanimate = end
         super.init(frame: frame)
         endanimate.delegate = self
-        self.layer.addSublayer(bar)
+        self.layer.addSublayer(strip)
     }
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -82,30 +79,30 @@ class LinearProgressView: UIView, CAAnimationDelegate {
             w = layer.bounds.width
             path.addLine(to: CGPoint(x: 0, y: layer.bounds.height))
         }
-        bar.frame = f
-        bar.path = path.cgPath
-        bar.lineWidth = w
+        strip.frame = f
+        strip.path = path.cgPath
+        strip.lineWidth = w
     }
     override func willMove(toSuperview newSuperview: UIView?) {
         if newSuperview == nil {
             endanimate.delegate = nil
-            bar.removeAllAnimations()
-            bar.removeFromSuperlayer()
+            strip.removeAllAnimations()
+            strip.removeFromSuperlayer()
         }
     }
     
     fileprivate func enableAnimation() {
-        if let _ = bar.animation(forKey: BannerAnimation.Keys.linearProgressStrokeEnd) {
-            bar.removeAnimation(forKey: BannerAnimation.Keys.linearProgressStrokeEnd)
+        if let _ = strip.animation(forKey: BannerAnimation.Keys.linearProgressStrokeEnd) {
+            strip.removeAnimation(forKey: BannerAnimation.Keys.linearProgressStrokeEnd)
         }
         if isAnimatable {
-            bar.add(endanimate, forKey: BannerAnimation.Keys.linearProgressStrokeEnd)
+            strip.add(endanimate, forKey: BannerAnimation.Keys.linearProgressStrokeEnd)
         }
     }
     
     fileprivate func disableAnimation() {
-        if let _ = bar.animation(forKey: BannerAnimation.Keys.linearProgressStrokeEnd) {
-            bar.removeAnimation(forKey: BannerAnimation.Keys.linearProgressStrokeEnd)
+        if let _ = strip.animation(forKey: BannerAnimation.Keys.linearProgressStrokeEnd) {
+            strip.removeAnimation(forKey: BannerAnimation.Keys.linearProgressStrokeEnd)
         }
     }
     
@@ -140,11 +137,11 @@ extension LinearProgressView: BannerPageItem {
     
     var highlightTintColor: UIColor? {
         get {
-            return bar.strokeColor == nil ? nil : UIColor(cgColor: bar.strokeColor!)
+            return strip.strokeColor == nil ? nil : UIColor(cgColor: strip.strokeColor!)
         }
         set {
-            if newValue?.cgColor != bar.strokeColor {
-                bar.strokeColor = newValue?.cgColor
+            if newValue?.cgColor != strip.strokeColor {
+                strip.strokeColor = newValue?.cgColor
             }
         }
     }

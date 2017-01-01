@@ -8,7 +8,7 @@
 
 import UIKit
 
-class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollectionViewDelegate where T: BannerPageControlItem {
+class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollectionViewDelegate where T: BannerControlItem {
     
     fileprivate var timer: Timer!
     
@@ -55,6 +55,12 @@ class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollecti
         }
     }
     
+    
+    /// Issues
+    ///
+    /// Setting collectionView.collectionViewLayout.scrollDirection will make collection view scroll to the first page
+    ///
+    
     var itemSize: CGSize {
         get {
             if let c = collectionView.collectionViewLayout as? BannerLayout {
@@ -70,8 +76,6 @@ class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollecti
         }
     }
     
-    /// Issues
-    /// Setting c.scrollDirection will make collection view scroll to the first page
     var scrollDirection: BannerScrollDirection {
         get {
             if let c = collectionView.collectionViewLayout as? BannerLayout {
@@ -126,7 +130,7 @@ class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollecti
     deinit {
         print(collectionView == nil ? "collectionView.deinit" : "Error collectionView!")
         print(pageControl == nil ? "pageControl.deinit" : "Error pageControl!")
-        print("ScrollBannerView.deinit")
+        print("BannerView.deinit")
     }
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

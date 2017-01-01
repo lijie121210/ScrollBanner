@@ -58,7 +58,7 @@ protocol Selectable: class {
     var selectedAction: ((_ on: Self, _ atIndex: Int) -> ())? {get set}
 }
 
-protocol BannerPageControlItem : class, Selectable {
+protocol BannerControlItem : class, Selectable {
     var numberOfPages: Int {get set}
     
     var currentPage: Int {get set}
@@ -95,7 +95,14 @@ protocol BannerPageItem: class, Colorable {
     func resignFocus()
 }
 
-
+public struct BannerAnimation {
+    
+    public struct Keys {
+        public static let `default` = "BannerAnimation"
+    }
+    
+    
+}
 
 
 

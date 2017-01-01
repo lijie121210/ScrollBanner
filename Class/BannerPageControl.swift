@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 
-final class BannerPageControl <T: UIView> : UIControl, BannerPageControlItem  where T: BannerPageItem {
+final class BannerPageControl <T: UIView> : UIControl, BannerControlItem  where T: BannerPageItem {
     
     /// Saving all indicators
     fileprivate var items:[T] = []
@@ -177,7 +177,7 @@ final class BannerPageControl <T: UIView> : UIControl, BannerPageControlItem  wh
     
     
     deinit {
-        print("ProgressPageControl.deinit")
+        print("BannerPageControl<\(T.self)>.deinit")
     }
     
     override func willMove(toSuperview newSuperview: UIView?) {

@@ -8,18 +8,13 @@
 
 import UIKit
 
-extension CAAnimation {
-    
-    public struct AnimateKey {
-        
-    }
-    
-}
 
-extension CAAnimation.AnimateKey {
-    static let strokeEnd = "LinearProgressView_end_animate_key"
+//public extension CAAnimation.Keys {
+//
+//}
+public extension BannerAnimation.Keys {
+    public static let linearProgressStrokeEnd = "LinearProgressView_end_animate_key"
 }
-
 
 class LinearProgressView: UIView, CAAnimationDelegate {
     
@@ -38,7 +33,7 @@ class LinearProgressView: UIView, CAAnimationDelegate {
     /// Life Cycle
     
     deinit {
-        print("ProgressView.deinit")
+        print("LinearProgressView.deinit")
     }
     
     override init(frame: CGRect) {
@@ -100,17 +95,17 @@ class LinearProgressView: UIView, CAAnimationDelegate {
     }
     
     fileprivate func enableAnimation() {
-        if let _ = bar.animation(forKey: CAAnimation.AnimateKey.strokeEnd) {
-            bar.removeAnimation(forKey: CAAnimation.AnimateKey.strokeEnd)
+        if let _ = bar.animation(forKey: BannerAnimation.Keys.linearProgressStrokeEnd) {
+            bar.removeAnimation(forKey: BannerAnimation.Keys.linearProgressStrokeEnd)
         }
         if isAnimatable {
-            bar.add(endanimate, forKey: CAAnimation.AnimateKey.strokeEnd)
+            bar.add(endanimate, forKey: BannerAnimation.Keys.linearProgressStrokeEnd)
         }
     }
     
     fileprivate func disableAnimation() {
-        if let _ = bar.animation(forKey: CAAnimation.AnimateKey.strokeEnd) {
-            bar.removeAnimation(forKey: CAAnimation.AnimateKey.strokeEnd)
+        if let _ = bar.animation(forKey: BannerAnimation.Keys.linearProgressStrokeEnd) {
+            bar.removeAnimation(forKey: BannerAnimation.Keys.linearProgressStrokeEnd)
         }
     }
     
@@ -161,8 +156,5 @@ extension LinearProgressView: BannerPageItem {
     func resignFocus() {
         disableAnimation()
     }
-    
-    
-    
 }
 

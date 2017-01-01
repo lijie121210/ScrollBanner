@@ -45,12 +45,14 @@ class ViewController: UIViewController {
         view.addSubview(button3)
         
         banner = BannerView< BannerPageControl< LinearProgressView > >(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 300))
+        view.addSubview(banner)
         
-//        banner.scrollDirection = .vertical
-
-//        view.addSubview(banner)
-        
-//        banner.scrollDirection = .vertical
+        banner.selectedAction = { (banner, index) -> () in
+            print("banner.selectedAction : ", index)
+        }
+        banner.scrolledAction = { (banner, index) -> () in
+            print("banner.scrolledAction : ", index)
+        }
         
         banner.scroll(items: [
             CellConfigurator<BannerImageCell>(viewData: BannerImageCellData(image: img1)),
@@ -58,9 +60,8 @@ class ViewController: UIViewController {
             CellConfigurator<BannerImageCell>(viewData: BannerImageCellData(image: img3))
             ])
         
-//        banner.scrollDirection = .vertical
-
-        view.addSubview(banner)
+       
+        
 
     }
     

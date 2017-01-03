@@ -8,27 +8,65 @@
 
 import UIKit
 
-class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollectionViewDelegate where T: BannerControlItem {
-    
-    private var timer: Timer!
-    
-    var pageControl: T!
-    var collectionView: UICollectionView!
 
+public struct Banner {
+    
+    public static var defaultFrame: CGRect {
+        let width = UIScreen.main.bounds.width
+        return CGRect(x: 0.0, y: 20.0, width: width, height: 300.0)
+    }
+    
+    public struct `default` {
+        
+        public static var system: BannerView<UIPageControl> {
+            return BannerView<UIPageControl>(frame: defaultFrame)
+        }
+        
+        public static var linear: BannerView<LinearPageControl<LinearProgressView > > {
+            return BannerView<LinearPageControl<LinearProgressView > >(frame: defaultFrame)
+        }
+        
+        public static var circle: BannerView<CirclePageControl<CircleProgressView > > {
+            return BannerView<CirclePageControl<CircleProgressView > >(frame: defaultFrame)
+        }
+    }
+}
+
+extension UIPageControl: BannerControlItem {
+    
+    open var jumpToIndex: Int {
+        get {
+            return currentPage
+        }
+        set {
+            currentPage = newValue
+        }
+    }
+    
+    open func endResponseDragging() { }
+    
+    open func startResponseDragging() { }
+    
+}
+
+open class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollectionViewDelegate where T: BannerControlItem {
+    
+    open var timer: Timer!
+    open var pageControl: T!
+    open var collectionView: UICollectionView!
 
     /// Touch event callback
     
-    var selectedAction: ( (_ banner: BannerView<T>, _ index: Int) -> () )?
-    var scrolledAction: ( (_ banner: BannerView<T>, _ index: Int) -> () )?
+    open var selectedAction: ( (_ banner: BannerView<T>, _ index: Int) -> () )?
+    open var scrolledAction: ( (_ banner: BannerView<T>, _ index: Int) -> () )?
     
     
     /// itemCount = items.count * contentExpendFactor
     
-    fileprivate var itemCount: Int = 0
+    open var itemCount: Int = 0
+    open let contentExpendFactor: Int = 50
     
-    fileprivate let contentExpendFactor: Int = 50
-    
-    fileprivate var items: [CellConfigurable] = [] {
+    open var items: [CellConfigurable] = [] {
         didSet {
             invalidTimer()
 
@@ -53,13 +91,24 @@ class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollecti
         }
     }
     
+    open override var frame: CGRect {
+        didSet {
+            guard let c = collectionView, let p = pageControl else {
+                return
+            }
+            c.frame = CGRect(x: 0, y: 0, width: frame.width, height: frame.height)
+//            (c.collectionViewLayout as! BannerLayout).itemSize = frame.size
+            p.frame = pageControlFrame
+            
+        }
+    }
     
     /// Issues
     ///
     /// Setting collectionView.collectionViewLayout.scrollDirection will make collection view scroll to the first page
     ///
     
-    var itemSize: CGSize {
+    open var itemSize: CGSize {
         get {
             if let c = collectionView.collectionViewLayout as? BannerLayout {
                 return c.itemSize
@@ -74,7 +123,7 @@ class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollecti
         }
     }
     
-    var scrollDirection: BannerScrollDirection {
+    open var scrollDirection: BannerScrollDirection {
         get {
             if let c = collectionView.collectionViewLayout as? BannerLayout {
                 return c.scrollDirection
@@ -89,7 +138,7 @@ class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollecti
         }
     }
     
-    var pageControlAsidePosition: BannerIndicatorAsidePosition = .bottom(offset: 8.0) {
+    open var pageControlAsidePosition: BannerControlAsidePosition = .bottom(offset: 8.0) {
         didSet {
             guard let p = pageControl, pageControlAsidePosition != oldValue else {
                 return
@@ -118,8 +167,19 @@ class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollecti
     /// - beginDraggingIndex = -1               : scrollViewDidScroll(_:) be called
     fileprivate var beginDraggingIndex: Int = -1
     
-    
-    
+    /// Fixed
+    ///
+    /// If the creation work is done in viewDidLoad(), then the view controller is rendered, the first animation is not displayed.
+    /// So, call this method in viewWillAppear(_:) or viewDidAppear(_:) to force the first animation to be displayed.
+    func forceAnimationAfterPresenting() {
+        let index = itemIndex(with: cellIndex())
+        if index >= 0, index < items.count, let p = pageControl {
+            if p.currentPage == index {
+                p.currentPage = -1
+            }
+            p.currentPage = index
+        }
+    }
     
     
     
@@ -130,7 +190,8 @@ class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollecti
         print(pageControl == nil ? "pageControl.deinit" : "Error pageControl!")
         print("BannerView.deinit")
     }
-    required init?(coder aDecoder: NSCoder) {
+    
+    required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     override init(frame: CGRect) {
@@ -138,18 +199,24 @@ class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollecti
         
         initialization()
     }
-    override func awakeFromNib() {
+    override open func awakeFromNib() {
         super.awakeFromNib()
         
         initialization()
     }
-    override func layoutSubviews() {
+    override open func layoutSubviews() {
         super.layoutSubviews()
-        if let c = collectionView {
-            c.frame = bounds
+//        if let c = collectionView {
+//            c.frame = bounds
+//        }
+        guard let c = collectionView, let p = pageControl else {
+            return
         }
+        c.frame = CGRect(x: 0, y: 0, width: frame.width, height: frame.height)
+        (c.collectionViewLayout as! BannerLayout).itemSize = frame.size
+        p.frame = pageControlFrame
     }
-    override func willMove(toSuperview newSuperview: UIView?) {
+    override open func willMove(toSuperview newSuperview: UIView?) {
         /// removed from superview
         
         guard newSuperview == nil else {
@@ -162,11 +229,11 @@ class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollecti
         scrolledAction = nil
     }
     
-    func scroll(items newItems: [CellConfigurable]) {
+    open func scroll(items newItems: [CellConfigurable]) {
         items = newItems
     }
     
-    func update<U: UICollectionViewLayout>(bannerLayout newLayout: U) where U: BannerLayout {
+    open func update<U: UICollectionViewLayout>(bannerLayout newLayout: U) where U: BannerLayout {
         guard let c = collectionView else {
             return
         }
@@ -181,7 +248,7 @@ class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollecti
     /// timer
     
     /// recreate a new timer instance
-    func validTimer() {
+    open func validTimer() {
         invalidTimer()
         timer = Timer.scheduledTimer(timeInterval: 3.0,
                                      target: self,
@@ -190,14 +257,14 @@ class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollecti
                                      repeats: true)
     }
     /// destroy this timer
-    func invalidTimer() {
+    open func invalidTimer() {
         if let t = timer, t.isValid {
             timer.invalidate()
             timer = nil
         }
     }
     /// call back method
-    func timerAction() {
+    open func timerAction() {
         guard itemCount > 1 else {
             return
         }
@@ -239,20 +306,20 @@ class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollecti
         return cv
     }
     
-    private func setupPageControl() -> T {
+    open func setupPageControl() -> T {
         let control = T(frame: pageControlFrame)
         control.addTarget(self, action: #selector(BannerView.didReceiveEvent(_:)), for: UIControlEvents.valueChanged)
         addSubview(control)
         return control
     }
     
-    func didReceiveEvent(_ sender: Any?) {
+    open func didReceiveEvent(_ sender: Any?) {
         guard let sender = sender as? T else {
             return
         }
         invalidTimer()
         sender.startResponseDragging()
-        let jumpResult = jumpIndex(to: sender.selectedIndex)
+        let jumpResult = jumpIndex(to: sender.jumpToIndex)
         sender.endResponseDragging()
         if jumpResult.isJumpped {
             scroll(to: jumpResult.index, isAnimated: true)
@@ -265,7 +332,7 @@ class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollecti
     
     /// Clean up refercence
     
-    private func cleanupCollectionView() {
+    open func cleanupCollectionView() {
         if let cv = collectionView {
             cv.dataSource = nil
             cv.delegate = nil
@@ -287,7 +354,7 @@ class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollecti
     /// It's strange that layout.scrollDirection will be a sudden error,
     /// although this will cause nothing (cellIndex % items.count not change)
     /// - return Cell Index between 0...itemCount-1
-    fileprivate func cellIndex() -> Int {
+    open func cellIndex() -> Int {
         guard let c = collectionView, c.bounds.width > 0.0, c.bounds.height > 0.0 else {
             return 0
         }
@@ -300,7 +367,7 @@ class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollecti
     
     /// - cellIndex Cell index between 0...itemCount-1
     /// - return Item index between 0..<items.count
-    fileprivate func itemIndex(with cellIndex: Int) -> Int {
+    open func itemIndex(with cellIndex: Int) -> Int {
         guard cellIndex >= 0, items.isEmpty == false else {
             return 0
         }
@@ -310,7 +377,7 @@ class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollecti
     /// Invoke when user selected page control indicator
     /// - item Target item index in items, between 0..<items.count
     /// - return New cell index between 0...itemCount-1
-    fileprivate func jumpIndex(to item: Int) -> (isJumpped: Bool, index: Int) {
+    open func jumpIndex(to item: Int) -> (isJumpped: Bool, index: Int) {
         let curr = cellIndex()
         let currItemIndex = itemIndex(with: curr)
         var target = curr
@@ -327,7 +394,7 @@ class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollecti
     
     /// scroll collectionView to target cell index
     /// - targetIndex Should between 0...itemCount-1
-    fileprivate func scroll(to targetIndex: Int, isAnimated animated: Bool = true) {
+    open func scroll(to targetIndex: Int, isAnimated animated: Bool = true) {
         guard collectionView != nil else {
             return
         }
@@ -347,10 +414,10 @@ class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollecti
     
     /// UICollectionViewDataSource
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    open func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return itemCount
     }
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let configurator = items[itemIndex(with: indexPath.item)]
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: configurator.reuseIdentifier, for: indexPath)
         configurator.update(cell: cell)
@@ -363,13 +430,13 @@ class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollecti
     /// Handle scroll drag action;
     ///
     
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    open func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if let action = selectedAction {
             action(self, itemIndex(with: indexPath.item))
         }
     }
     
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    open func scrollViewDidScroll(_ scrollView: UIScrollView) {
         guard items.isEmpty == false, isEndDragging, let p = pageControl else {
             return
         }
@@ -382,7 +449,7 @@ class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollecti
         
         p.currentPage = itemIndex(with: cellIndex() )
     }
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+    open func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         guard itemCount > 1, scrollView.isScrollEnabled, let p = pageControl else {
             return
         }
@@ -395,7 +462,7 @@ class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollecti
         p.startResponseDragging()
         invalidTimer()
     }
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+    open func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         guard let p = pageControl else {
             return
         }
@@ -406,10 +473,10 @@ class BannerView <T: UIControl> : UIView, UICollectionViewDataSource, UICollecti
     }
     
     
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+    open func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         scrollViewDidEndScrollingAnimation(scrollView)
     }
-    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+    open func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
         guard items.isEmpty == false, let action = scrolledAction else {
             return
         }

@@ -8,6 +8,23 @@
 
 import UIKit
 
+class Test {
+    deinit {
+        print("-1")
+    }
+    init() {
+        print("1")
+    }
+}
+
+struct STest {
+    struct Share {
+        static var instance: Test {
+            return Test()
+        }
+    }
+}
+
 class ViewController: UIViewController {
 
     var banner: BannerView<LinearPageControl<LinearProgressView > >!
@@ -16,18 +33,18 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         
         banner = BannerView< LinearPageControl< LinearProgressView > >(frame: CGRect(x: 0, y: 20, width: view.bounds.width, height: 280))
-        banner.backgroundColor = UIColor.lightGray
         view.addSubview(banner)
         
         let items = [CellConfigurator<BannerTextCell>(viewData: BannerTextCellData(text: "Linear progress banner indicator")),
                      CellConfigurator<BannerTextCell>(viewData: BannerTextCellData(text: "Circle progress banner indicator")),
-                     CellConfigurator<BannerTextCell>(viewData: BannerTextCellData(text: "Dots banner indicator"))]
+                     CellConfigurator<BannerTextCell>(viewData: BannerTextCellData(text: "System page control indicator"))]
         
         banner.selectedAction = { [weak self] (banner, index) -> () in
             var controller: UIViewController? = nil
             switch index {
             case 0: controller = LinearViewController()
             case 1: controller = CircleViewController()
+            case 2: controller = SystemViewController()
             default: break
             }
             guard let c = controller else {
@@ -60,6 +77,7 @@ class ViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        banner.forceAnimationAfterPresenting()
         
     }
 

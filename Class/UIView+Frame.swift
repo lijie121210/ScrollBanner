@@ -11,7 +11,7 @@ import UIKit
 
 extension UIView {
     
-    var isHorizontal: Bool {
+    public var isHorizontal: Bool {
         return bounds.width >= bounds.height
     }
     
@@ -19,38 +19,11 @@ extension UIView {
 
 extension CALayer {
     
-    var isHorizontal: Bool {
+    public var isHorizontal: Bool {
         return bounds.width >= bounds.height
     }
     
 }
 
 
-extension UIPageControl: BannerControlItem {
-    
-    struct AssociatedKeys {
-        static var selectedIndexKey = "selectedIndexKey"
-    }
-    
-    internal var selectedIndex: Int {
-        get {
-            return objc_getAssociatedObject(self, &AssociatedKeys.selectedIndexKey) as! Int
-        }
-        set {
-            objc_setAssociatedObject(self, &AssociatedKeys.selectedIndexKey, newValue, .OBJC_ASSOCIATION_COPY)
-        }
-    }
 
-    
-    internal func endResponseDragging() {
-        
-    }
-
-    internal func startResponseDragging() {
-        
-    }
-
-    
-
-    
-}

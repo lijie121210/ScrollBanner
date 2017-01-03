@@ -1,20 +1,20 @@
 //
-//  CircleBannerViewController.swift
+//  SystemViewController.swift
 //  ScrollBanner
 //
-//  Created by jie on 2017/1/1.
+//  Created by jie on 2017/1/2.
 //  Copyright © 2017年 HTIOT.Inc. All rights reserved.
 //
 
 import UIKit
 
-class CircleViewController: UIViewController {
+class SystemViewController: UIViewController {
 
-    var banner: BannerView<CirclePageControl<CircleProgressView > >!
+    var banner: BannerView<UIPageControl>!
+    var banner2 = Banner.default.system
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         
         view.backgroundColor = UIColor.white
         
@@ -29,7 +29,7 @@ class CircleViewController: UIViewController {
         let items = [CellConfigurator<BannerImageCell>(viewData: BannerImageCellData(image: img1)),
                      CellConfigurator<BannerImageCell>(viewData: BannerImageCellData(image: img2)),
                      CellConfigurator<BannerImageCell>(viewData: BannerImageCellData(image: img3))]
-        banner = BannerView<CirclePageControl< CircleProgressView > >(frame: CGRect(x: 0, y: 64, width: view.bounds.width, height: 300))
+        banner = BannerView<UIPageControl>(frame: CGRect(x: 0, y: 64, width: view.bounds.width, height: 300))
         view.addSubview(banner)
         
         banner.selectedAction = { (banner, index) -> () in
@@ -42,13 +42,18 @@ class CircleViewController: UIViewController {
         banner.scroll(items: items)
         
         
+        banner2.frame = CGRect(x: 0, y: 370, width: view.bounds.width, height: 300)
+        view.addSubview(banner2)
+        banner2.scroll(items: items)
+        
+        
         let button = UIButton(frame: CGRect(x: 0, y: 20, width: view.bounds.width, height: 40))
         button.setTitle("back", for: .normal)
         button.setTitleColor(UIColor.black, for: .normal)
-        button.addTarget(self, action: #selector(CircleViewController.back), for: .touchUpInside)
+        button.addTarget(self, action: #selector(SystemViewController.back), for: .touchUpInside)
         view.addSubview(button)
     }
-
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
@@ -57,7 +62,7 @@ class CircleViewController: UIViewController {
         super.viewDidAppear(animated)
         
         banner.forceAnimationAfterPresenting()
-
+        
         
     }
     override func viewWillDisappear(_ animated: Bool) {
@@ -81,4 +86,5 @@ class CircleViewController: UIViewController {
         b.removeFromSuperview()
         banner = nil
     }
+
 }

@@ -30,6 +30,9 @@
 		182F096F1E19416F00A43C72 /* CircleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182F096E1E19416F00A43C72 /* CircleViewController.swift */; };
 		182F09711E1941A600A43C72 /* LinearViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182F09701E1941A600A43C72 /* LinearViewController.swift */; };
 		182F09731E19422400A43C72 /* BannerTextCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182F09721E19422400A43C72 /* BannerTextCell.swift */; };
+		182F09751E1A1DAB00A43C72 /* BannerPageControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182F09741E1A1DAB00A43C72 /* BannerPageControl.swift */; };
+		182F09771E1A223C00A43C72 /* CirclePageControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182F09761E1A223C00A43C72 /* CirclePageControl.swift */; };
+		182F097A1E1A79F400A43C72 /* SystemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182F09791E1A79F400A43C72 /* SystemViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,6 +82,9 @@
 		182F096E1E19416F00A43C72 /* CircleViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CircleViewController.swift; sourceTree = "<group>"; };
 		182F09701E1941A600A43C72 /* LinearViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinearViewController.swift; sourceTree = "<group>"; };
 		182F09721E19422400A43C72 /* BannerTextCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BannerTextCell.swift; sourceTree = "<group>"; };
+		182F09741E1A1DAB00A43C72 /* BannerPageControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BannerPageControl.swift; sourceTree = "<group>"; };
+		182F09761E1A223C00A43C72 /* CirclePageControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CirclePageControl.swift; sourceTree = "<group>"; };
+		182F09791E1A79F400A43C72 /* SystemViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SystemViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -132,8 +138,9 @@
 			children = (
 				182529A31E10B9B000E157D6 /* AppDelegate.swift */,
 				182529A51E10B9B000E157D6 /* ViewController.swift */,
-				182F096E1E19416F00A43C72 /* CircleViewController.swift */,
 				182F09701E1941A600A43C72 /* LinearViewController.swift */,
+				182F096E1E19416F00A43C72 /* CircleViewController.swift */,
+				182F09791E1A79F400A43C72 /* SystemViewController.swift */,
 				182529A71E10B9B000E157D6 /* Main.storyboard */,
 				182529AA1E10B9B000E157D6 /* Assets.xcassets */,
 				182529AC1E10B9B000E157D6 /* LaunchScreen.storyboard */,
@@ -173,7 +180,9 @@
 				182F09521E1740EA00A43C72 /* BannerLayout.swift */,
 				182F09541E1740EA00A43C72 /* BannerControlItem.swift */,
 				182F096A1E1757C000A43C72 /* BannerView.swift */,
+				182F09741E1A1DAB00A43C72 /* BannerPageControl.swift */,
 				182F09531E1740EA00A43C72 /* LinearPageControl.swift */,
+				182F09761E1A223C00A43C72 /* CirclePageControl.swift */,
 				182F09571E1740EA00A43C72 /* LinearProgressView.swift */,
 				182F09681E174DE500A43C72 /* CircleProgressView.swift */,
 				182F095B1E1740EA00A43C72 /* UIView+Frame.swift */,
@@ -322,7 +331,10 @@
 			files = (
 				182F09631E1740EA00A43C72 /* LinearProgressView.swift in Sources */,
 				182F09711E1941A600A43C72 /* LinearViewController.swift in Sources */,
+				182F09771E1A223C00A43C72 /* CirclePageControl.swift in Sources */,
+				182F09751E1A1DAB00A43C72 /* BannerPageControl.swift in Sources */,
 				182F095E1E1740EA00A43C72 /* BannerLayout.swift in Sources */,
+				182F097A1E1A79F400A43C72 /* SystemViewController.swift in Sources */,
 				182F09691E174DE500A43C72 /* CircleProgressView.swift in Sources */,
 				182F09671E1740EA00A43C72 /* UIView+Frame.swift in Sources */,
 				182529A61E10B9B000E157D6 /* ViewController.swift in Sources */,

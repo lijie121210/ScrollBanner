@@ -8,11 +8,11 @@
 
 import UIKit
 
-struct BannerTextCellData {
-    let text: String
+public struct BannerTextCellData {
+    public let text: String
 }
 
-class BannerTextCell: UICollectionViewCell {
+public class BannerTextCell: UICollectionViewCell {
     
     weak var textLabel: UILabel?
     
@@ -20,10 +20,10 @@ class BannerTextCell: UICollectionViewCell {
         super.init(frame: frame)
         createViews()
     }
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    override func awakeFromNib() {
+    override public func awakeFromNib() {
         super.awakeFromNib()
         createViews()
     }
@@ -32,7 +32,7 @@ class BannerTextCell: UICollectionViewCell {
         contentView.addSubview(label)
         textLabel = label
     }
-    override func layoutSubviews() {
+    override public func layoutSubviews() {
         super.layoutSubviews()
         guard let label = textLabel else {
             return
@@ -47,9 +47,9 @@ class BannerTextCell: UICollectionViewCell {
 }
 
 extension BannerTextCell: Updatable {
-    typealias ViewData = BannerTextCellData
+    public typealias ViewData = BannerTextCellData
     
-    func update(viewData: BannerTextCellData) {
+    public func update(viewData: BannerTextCellData) {
         textLabel?.text = viewData.text
     }
 }

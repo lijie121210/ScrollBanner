@@ -16,8 +16,8 @@ import UIKit
 ///     Change UIImage to String type, then we can handle http image and local image using imageView,
 ///     but create specific cell and cell data would be better.
 ///
-struct BannerImageCellData {
-    let image: UIImage
+public struct BannerImageCellData {
+    public let image: UIImage
 }
 
 
@@ -25,17 +25,17 @@ struct BannerImageCellData {
 ///
 /// Default cell with a single image view
 ///
-class BannerImageCell: UICollectionViewCell {
+public class BannerImageCell: UICollectionViewCell {
     weak var imageView: UIImageView?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         createViews()
     }
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    override func awakeFromNib() {
+    override public func awakeFromNib() {
         super.awakeFromNib()
         createViews()
     }
@@ -47,16 +47,16 @@ class BannerImageCell: UICollectionViewCell {
         self.contentView.addSubview(imgView)
         imageView = imgView
     }
-    override func layoutSubviews() {
+    override public func layoutSubviews() {
         super.layoutSubviews()
         imageView?.frame = bounds
     }
 }
 
 extension BannerImageCell: Updatable {
-    typealias ViewData = BannerImageCellData
+    public typealias ViewData = BannerImageCellData
     
-    func update(viewData: BannerImageCellData) {
+    public func update(viewData: BannerImageCellData) {
         imageView?.image = viewData.image
     }
 }

@@ -15,7 +15,7 @@ import UIKit
 ///
 /// Requirement for cell
 ///
-protocol Updatable: class {
+public protocol Updatable: class {
     
     associatedtype ViewData
     
@@ -27,7 +27,7 @@ protocol Updatable: class {
 /// 
 /// Requirement for cell configurator
 ///
-protocol CellConfigurable {
+public protocol CellConfigurable {
     var reuseIdentifier: String { get }
     var cellClass: AnyClass { get }
     
@@ -38,15 +38,15 @@ protocol CellConfigurable {
 ///
 /// Basic configurator for cell
 ///
-struct CellConfigurator<Cell> where Cell: Updatable, Cell: UICollectionViewCell {
+public struct CellConfigurator<Cell> where Cell: Updatable, Cell: UICollectionViewCell {
     
-    let reuseIdentifier: String = "\(Cell.self)"
-    let cellClass: AnyClass = Cell.self
+    public let reuseIdentifier: String = "\(Cell.self)"
+    public let cellClass: AnyClass = Cell.self
     
     /// need init
     let viewData: Cell.ViewData
     
-    func update(cell: UICollectionViewCell) {
+    public func update(cell: UICollectionViewCell) {
         if let cell = cell as? Cell {
             cell.update(viewData: viewData)
         }

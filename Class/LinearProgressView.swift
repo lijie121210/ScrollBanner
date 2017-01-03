@@ -13,7 +13,7 @@ public extension BannerAnimation.Keys {
     public static let linearProgressStrokeEnd = "LinearProgressView_end_animate_key"
 }
 
-class LinearProgressView: UIView, CAAnimationDelegate {
+public class LinearProgressView: UIView, CAAnimationDelegate {
     
     var strip: CAShapeLayer
     var endanimate: CABasicAnimation
@@ -21,7 +21,7 @@ class LinearProgressView: UIView, CAAnimationDelegate {
     
     /// CAAnimationDelegate
     
-    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+    public func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
         if anim is CABasicAnimation {
             strip.strokeEnd = 0.001
         }
@@ -57,10 +57,10 @@ class LinearProgressView: UIView, CAAnimationDelegate {
         endanimate.delegate = self
         self.layer.addSublayer(strip)
     }
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    override func layoutSublayers(of layer: CALayer) {
+    override public func layoutSublayers(of layer: CALayer) {
         super.layoutSublayers(of: layer)
         
         var f = CGRect.zero
@@ -83,7 +83,7 @@ class LinearProgressView: UIView, CAAnimationDelegate {
         strip.path = path.cgPath
         strip.lineWidth = w
     }
-    override func willMove(toSuperview newSuperview: UIView?) {
+    override public func willMove(toSuperview newSuperview: UIView?) {
         if newSuperview == nil {
             endanimate.delegate = nil
             strip.removeAllAnimations()
@@ -113,7 +113,7 @@ class LinearProgressView: UIView, CAAnimationDelegate {
 
 extension LinearProgressView: BannerPageItem {
     
-    var isFocusable: Bool {
+    public var isFocusable: Bool {
         get {
             return isAnimatable
         }
@@ -124,7 +124,7 @@ extension LinearProgressView: BannerPageItem {
         }
     }
     
-    var normalTintColor: UIColor? {
+    public var normalTintColor: UIColor? {
         get {
             return backgroundColor
         }
@@ -135,7 +135,7 @@ extension LinearProgressView: BannerPageItem {
         }
     }
     
-    var highlightTintColor: UIColor? {
+    public var highlightTintColor: UIColor? {
         get {
             return strip.strokeColor == nil ? nil : UIColor(cgColor: strip.strokeColor!)
         }
@@ -146,11 +146,11 @@ extension LinearProgressView: BannerPageItem {
         }
     }
     
-    func becomeFocus() {
+    public func becomeFocus() {
         enableAnimation()
     }
     
-    func resignFocus() {
+    public func resignFocus() {
         disableAnimation()
     }
 }

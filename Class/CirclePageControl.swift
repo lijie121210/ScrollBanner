@@ -1,32 +1,35 @@
 //
-//  BannerPageControl.swift
+//  CirclePageControl.swift
 //  ScrollBanner
 //
-//  Created by jie on 2016/12/29.
-//  Copyright © 2016年 HTIOT.Inc. All rights reserved.
+//  Created by jie on 2017/1/2.
+//  Copyright © 2017年 HTIOT.Inc. All rights reserved.
 //
 
-import Foundation
 import UIKit
 
 
-public class LinearPageControl <T: UIView> : BannerPageControl<T>  where T: BannerPageItem {
+extension BannerPageControl {
+    
+}
+
+public class CirclePageControl <T: UIView> : BannerPageControl<T>  where T: BannerPageItem  {
     
     deinit {
-        print("LinearPageControl<\(T.self)>.deinit")
+        print("CirclePageControl<\(T.self)>.deinit")
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-
+        
         indicatorLayout = BannerControlItemLayout(bounds: CGRect(origin: CGPoint.zero, size: frame.size),
                                                   indicatorCount: 0,
                                                   lineSpace: 20.0,
-                                                  indicatorWidth: 2.0,
-                                                  indicatorHeight: 2.0,
-                                                  indicatorContentWidthLimit: 60.0,
-                                                  indicatorContentHeightLimit: 60.0,
-                                                  isAdapt: true)
+                                                  indicatorWidth: 10.0,
+                                                  indicatorHeight: 10.0,
+                                                  indicatorContentWidthLimit: 10.0,
+                                                  indicatorContentHeightLimit: 10.0,
+                                                  isAdapt: false)
     }
     
     required public init?(coder aDecoder: NSCoder) {
@@ -37,7 +40,7 @@ public class LinearPageControl <T: UIView> : BannerPageControl<T>  where T: Bann
         let p = super.createIndicator()
         
         p.normalTintColor = UIColor(white: 0.9, alpha: 0.9)
-        p.highlightTintColor = UIColor.gray
+        p.highlightTintColor = UIColor.white
         
         p.layer.shadowColor = UIColor.black.cgColor
         p.layer.shadowOpacity = 0.2
@@ -52,8 +55,5 @@ public class LinearPageControl <T: UIView> : BannerPageControl<T>  where T: Bann
         }
         return p
     }
+
 }
-
-
-
-
